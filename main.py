@@ -14,8 +14,8 @@ from datetime import date
 import datetime
 import calendar
 import pyperclip 
-
-
+import json
+import time
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -32,7 +32,6 @@ def resource_path(relative_path):
 main_color = '#313942'
 
 root = tk.Tk()
-root.geometry("700x500")
 root.config(bg=main_color)
 root.title("Entourage Hours Sheets")
 root.iconbitmap(resource_path('assets\\EIB_black_pink.ico'))
@@ -50,9 +49,42 @@ global settings_photo
 settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 
 
+def update_check():
+    print('checking for updates')
+    root.geometry('300x300')
+    main_background =tk.Label(blank_background, bg=main_color)
+    main_background.place(relheight=1, relwidth=1)
+    update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
+    update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
+
+    url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+    info = requests.get(url).json()
+    server_app_version = info['info']['APP_VERSION']
+
+
+    local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
+    local_info = json.load(local_info)
+    local_app_version =local_info['info']['APP_VERSION']
+
+    if server_app_version != local_app_version:
+        update_label.config(text='UPDATE REQUIRED!!')
+        update_button = tk.Button(main_background, text='Update', bg='black', fg='white')
+        update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
+
+
+    else:
+        update_label.after(3000, show_menu)
+    root.mainloop()
+
+def update_required(event, update_label,main_background):
+    update_label.config(text='UPDATE REQUIRED!!')
+    update_button = tk.Button(main_background, text='Update', bg='black', fg='white')
+    update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
+
 
 
 def show_menu():
+    root.geometry("700x500")
     main_background =tk.Label(blank_background, bg=main_color)
     main_background.place(relheight=1, relwidth=1)
 
@@ -79,7 +111,7 @@ def show_menu():
 
 
 
-    root.mainloop()
+
 
 
 def unpaid_students(menu_background): 
@@ -724,4 +756,4 @@ def clear_main(background):
     background.destroy()
     show_menu()
 
-show_menu()
+update_check()
