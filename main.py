@@ -17,6 +17,9 @@ import pyperclip
 import json
 import time
 
+##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
+
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
