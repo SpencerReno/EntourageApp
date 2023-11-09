@@ -77,7 +77,7 @@ def update_check():
 
 
     else:
-        update_label.after(3000, show_menu)
+        update_label.after(2000, show_menu)
     root.mainloop()
 
 def update_app():
