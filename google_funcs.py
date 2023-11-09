@@ -18,6 +18,40 @@ def adding(text):
 
     return total
 
+
+
+def get_student_status(course):
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv(url)
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    if course == 'Cos PT':
+        data = data[data['Groups'] =='Cosmetology Part Time']   
+    elif course == 'Cos FT':
+        data = data[data['Groups'] == 'Cosmetology Full Time']
+
+
+    elif course == 'Nails PT':
+        data = data[data['Groups'] == 'Nails Part Time']
+    elif course == 'Nails FT':
+        data = data[data['Groups'] == 'Nails Full Time']
+
+
+    elif course == 'Esti FT':
+        data = data[data['Groups'] == 'Esthetics Full Time']
+    elif course == 'Esti PT':
+        data = data[data['Groups'] == 'Esthetics Part Time']
+    
+    
+    elif course == 'Massage':
+        data = data[data['Groups'] == 'Massage Therapy']
+
+
+    return data
+
+
+
+
+
 def get_unpaid_students():
     url ='https://drive.google.com/file/d/1buS_BepyluxxeN1XS87vH6PC-RmBybmI/view?usp=sharing'
     file_id = url.split('/')[-2]
