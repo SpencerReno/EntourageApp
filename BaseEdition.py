@@ -486,6 +486,9 @@ def status_massage(background):
     data = pd.read_csv(url)
     data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
     data = data[data['Groups'] == 'Massage Therapy']
+    data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
+    data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -508,6 +511,8 @@ def status_cos(background):
     data = pd.read_csv(url)
     data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
     data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
+    data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
+    data['Tot hrs'] = data['Tot hrs'].astype(float)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -518,11 +523,11 @@ def status_cos(background):
     title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    cos_am = data[data['Groups'] == 'Cosmetology Full Time']
+    cos_am = data[data['Groups'] == 'Cosmetology Full Time'].sort_values('Tot hrs', ascending=False)
     cos_am_view = tk.Button(settings_background, text='Day Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_am, settings_background, tv1))
     cos_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    cos_pm = data[data['Groups'] == 'Cosmetology Part Time']
+    cos_pm = data[data['Groups'] == 'Cosmetology Part Time'].sort_values('Tot hrs', ascending=False)
     cos_pm_view = tk.Button(settings_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm, settings_background, tv1))
     cos_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
@@ -538,6 +543,8 @@ def status_esti(background):
     data = pd.read_csv(url)
     data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
     data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
+    data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
+    data['Tot hrs'] = data['Tot hrs'].astype(float)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -548,11 +555,11 @@ def status_esti(background):
     title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    esti_am = data[data['Groups'] == 'Esthetics Full Time']
+    esti_am = data[data['Groups'] == 'Esthetics Full Time'].sort_values('Tot hrs', ascending=False)
     esti_am_view = tk.Button(settings_background, text='Day Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_am, settings_background, tv1))
     esti_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    esti_pm = data[data['Groups'] == 'Esthetics Part Time']
+    esti_pm = data[data['Groups'] == 'Esthetics Part Time'].sort_values('Tot hrs', ascending=False)
     esti_pm_view = tk.Button(settings_background, text='Night Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_pm, settings_background, tv1))
     esti_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
@@ -567,6 +574,8 @@ def status_nails(background):
     data = pd.read_csv(url)
     data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
     data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
+    data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
+    data['Tot hrs'] = data['Tot hrs'].astype(float)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -577,11 +586,11 @@ def status_nails(background):
     title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    nail_am = data[data['Groups'] == 'Nails Full Time']
+    nail_am = data[data['Groups'] == 'Nails Full Time'].sort_values('Tot hrs', ascending=False)
     nail_am_view = tk.Button(settings_background, text='Day Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_am, settings_background, tv1))
     nail_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    nail_pm = data[data['Groups'] == 'Nails Part Time']
+    nail_pm = data[data['Groups'] == 'Nails Part Time'].sort_values('Tot hrs', ascending=False)
     nail_pm_view = tk.Button(settings_background, text='Night Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_pm, settings_background, tv1))
     nail_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
