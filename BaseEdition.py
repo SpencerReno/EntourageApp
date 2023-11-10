@@ -237,7 +237,7 @@ def settings_page():
     data_frame = tk.LabelFrame(settings_background)
     data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
 
-
+   
     tv1 = ttk.Treeview(data_frame)
     tv1.place(relheight=1, relwidth=1)
 
