@@ -644,6 +644,7 @@ def get_treeview(data, background):
 
 
 
+
 def get_path(event):
     pathLabel.configure(text = event.data)
 
