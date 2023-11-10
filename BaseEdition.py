@@ -121,14 +121,14 @@ def show_menu():
 
 
     directors_ed = tk.Label(main_background, text="INSTRUCTORS EDITION", bg=main_color, fg='black', font=('Times', '36','bold'))
-    directors_ed.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
+    directors_ed.place(relx=.07, rely=.05, relheight=.15, relwidth=.9)
 
     entourage_logo = tk.Label(main_background, width=w, height=h,image=EN_photo,bg=main_color)
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
 
 
-    payment_totals = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
-    payment_totals.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
+    status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
+    status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
 
     hours_creator = tk.Button(main_background, text='Hours Creator', bg='black', fg='white', command=lambda: hours_menu(main_background))
     hours_creator.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
@@ -490,10 +490,10 @@ def status_massage(background):
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
 
-    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(settings_background))
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Massage Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
 
@@ -512,10 +512,10 @@ def status_cos(background):
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
 
-    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(settings_background))
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     cos_am = data[data['Groups'] == 'Cosmetology Full Time']
@@ -542,10 +542,10 @@ def status_esti(background):
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
 
-    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(settings_background))
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     esti_am = data[data['Groups'] == 'Esthetics Full Time']
@@ -571,7 +571,7 @@ def status_nails(background):
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
 
-    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(settings_background))
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
     title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
@@ -641,6 +641,9 @@ def get_path(event):
 def clear(background):
     #background.destroy()
     hours_menu(background)
+
+def clear_status(background):
+    status_page(background)
 
 def clear_main(background):
     background.destroy()
