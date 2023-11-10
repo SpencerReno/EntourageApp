@@ -142,7 +142,7 @@ def show_menu():
     status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
     status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
 
-    update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: status_page(main_background))
+    update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: update_app(main_background))
     update_button.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
 
 
@@ -1005,8 +1005,21 @@ def get_treeview(data, background):
 
     return tv1 
 
-def update_app():
-    pass
+def update_app(background):
+    background.destroy()
+    update_background =tk.Label(blank_background, bg=main_color)
+    update_background.place(relheight=1, relwidth=1)
+
+    back_button = tk.Button(update_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(update_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    title_label = tk.Label(update_background, text = 'Application Update', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
+
+
+    data_entry_frame = tk.LabelFrame(update_background)
+    data_entry_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
 
 def get_path(event):
     pathLabel.configure(text = event.data)
