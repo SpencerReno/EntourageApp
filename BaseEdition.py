@@ -11,9 +11,7 @@ import requests
 from io import StringIO
 from tkinter.filedialog import asksaveasfile
 from datetime import date
-import datetime
-import calendar
-import pyperclip 
+import numpy as np
 import json
 import subprocess
 from urllib.request import urlretrieve
@@ -162,7 +160,7 @@ def hours_menu(main_background):
     hours_title= tk.Label(menu_background, text="HOURS CREATION", bg=main_color, fg='black', font=('Times', '36','bold'))
     hours_title.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
 
-    menu_cos = tk.Button(menu_background, text='Cosmetology', bg='black', fg='white', command=lambda: cos())
+    menu_cos = tk.Button(menu_background, text='Cosmetology', bg='black', fg='white', command=lambda: cos(menu_background))
     menu_cos.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
 
     menu_esti = tk.Button(menu_background, text='Esthetics', bg='maroon', fg='white', command=lambda: esti())
@@ -319,26 +317,42 @@ def add_student(submit_button, student_id_entry, student_first_entry,student_las
     else:
         submit_button.config(bg='Red') 
 
-def cos():
-    global pathLabel
-    menu_background.destroy()
+def cos(background):
+    background.destroy()
+    cos_full, cos_part = cos_online_hours()
+    cos_hours_background =tk.Label(blank_background, bg=main_color)
+    cos_hours_background.place(relheight=1, relwidth=1)
 
-    cos_background=tk.Label(blank_background, bg=main_color)
-    cos_background.place(relheight=1, relwidth=1)
+    back_button = tk.Button(cos_hours_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(cos_hours_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    entourage_logo = tk.Label(cos_background, width=w, height=h,image=EN_photo,bg=main_color)
-    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
+    title_label = tk.Label(cos_hours_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    cos_title = tk.Label(cos_background, text='COSMETOLOGY', bg = main_color, fg='black', font=('Times', '36','bold'))
-    cos_title.place(relx=.15, rely=.05, relheight=.15, relwidth=.7)
+   
+    cos_am_view = tk.Button(cos_hours_background, text='Day Cosmetology', bg='black', fg='white', command= lambda: new_hours_treeview(cos_full, cos_hours_background, tv1))
+    cos_am_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.75)
 
-    download_am = tk.Button(cos_background, text='Download AM', bg='black', fg='white', command= lambda: cos_data_creation('AM'))
-    download_am.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
+   
+    cos_pm_view = tk.Button(cos_hours_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: new_hours_treeview(cos_part, cos_hours_background, tv1))
+    cos_pm_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.88)
 
-    download_pm = tk.Button(cos_background, text='Download PM', bg='black', fg='white', command= lambda: cos_data_creation('PM'))
-    download_pm.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
+    submit_button = tk.Button(cos_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1))
+    submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
+    
 
-    back_button = tk.Button(cos_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear(cos_background))
+    tv1 = get_treeview(cos_full, cos_hours_background)
+
+    tv1.place(relheight=1, relwidth=1)
+
+
+    # download_am = tk.Button(cos_background, text='Download AM', bg='black', fg='white', command= lambda: cos_data_creation('AM'))
+    # download_am.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
+
+    # download_pm = tk.Button(cos_background, text='Download PM', bg='black', fg='white', command= lambda: cos_data_creation('PM'))
+    # download_pm.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
+
+    back_button = tk.Button(cos_hours_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear(cos_hours_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
 def massage():
@@ -412,6 +426,55 @@ def esti():
 
     back_button = tk.Button(esti_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear(esti_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+
+
+def new_hours_treeview(data, background, tree):
+    for item in tree.get_children():
+      tree.delete(item)
+
+    df_rows = data.to_numpy().tolist()
+    for row in df_rows:
+        tree.insert('', 'end', values=row)
+
+    for x in range(len(tree['column'])):
+        tree.heading(f'{x}', text=data.columns[x])
+
+
+
+def edit_tree(tree, event):
+    if tree.identify_region(event.x, event.y) == 'cell':
+        column = tree.identify_column(event.x)  # identify column
+        item = tree.identify_row(event.y)  # identify item
+        x, y, width, height = tree.bbox(item, column) 
+        value = tree.set(item, column)
+
+    def ok(event):
+        tree.set(item, column, entry.get())
+        entry.destroy()
+
+    entry = ttk.Entry(tree)  # create edition entry
+    entry.place(x=x, y=y, width=width, height=height,
+                anchor='nw')  # display entry on top of cell
+    entry.insert(0, value)  # put former value in entry
+    entry.bind('<FocusOut>', lambda e: entry.destroy())  
+    entry.bind('<Return>', ok)  # validate with Enter
+    entry.focus_set()
+
+
+
+def send_hours(tree):
+    row_list = []
+    cols = tree['columns']
+    for row in tree.get_children():
+        row_list.append(tree.item(row)['values'])
+    df = pd.DataFrame(row_list, columns=cols)
+
+    print(df)
+
+
+
+
 
 def status_page(background):
     background.destroy()
@@ -639,9 +702,9 @@ def get_treeview(data, background):
         tv1.insert('', 'end', values=row)
 
     tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
 
     return tv1 
-
 
 
 
