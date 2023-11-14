@@ -525,19 +525,22 @@ def hours_menu(main_background):
     hours_title.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
 
     menu_cos = tk.Button(menu_background, text='Cosmetology', bg='black', fg='white', command=lambda: cos())
-    menu_cos.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
+    menu_cos.place(relheight=.1,relwidth=.25, relx=.03,rely=.23)
 
     menu_esti = tk.Button(menu_background, text='Esthetics', bg='maroon', fg='white', command=lambda: esti())
-    menu_esti.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
+    menu_esti.place(relheight=.1,relwidth=.25, relx=.03,rely=.43)
 
     menu_nails = tk.Button(menu_background, text='Nails', bg='DarkBlue', fg='white', command=lambda: nails())
-    menu_nails.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
+    menu_nails.place(relheight=.1,relwidth=.25, relx=.03,rely=.63)
 
     menu_massage = tk.Button(menu_background, text='Massage', bg='dim Grey', fg='white', command=lambda: massage())
-    menu_massage.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
+    menu_massage.place(relheight=.1,relwidth=.25, relx=.03,rely=.83)
 
     back_button = tk.Button(menu_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear_main(menu_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    post_hours_button = tk.Button(menu_background, text='Post Hours', bg='Black', fg='white', activebackground='black',command= lambda: post_hours(menu_background))
+    post_hours_button.place(relheight=.1,relwidth=.25, relx=.7,rely=.88)
     
 
     w, h = settings_photo.width(), settings_photo.height()
@@ -548,7 +551,15 @@ def hours_menu(main_background):
     
 
     entourage_logo = tk.Label(menu_background, width=w, height=h,image=EN_photo,bg=main_color)
-    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
+    entourage_logo.place(relx=.35, rely=.35, relheight=.3, relwidth=.6)
+
+def post_hours(background):
+    background.destroy()
+    post_background=tk.Label(blank_background, bg=main_color)
+    post_background.place(relheight=1, relwidth=1)
+
+    
+
 
 def password():
     menu_background.destroy()
