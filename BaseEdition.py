@@ -1,5 +1,4 @@
 import tkinter as tk 
-#from PIL import ImageTk, Image
 from google_funcs import *
 from tkinter.filedialog import asksaveasfile
 from tkinter import ttk, filedialog, messagebox
