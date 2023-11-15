@@ -568,6 +568,7 @@ def status_massage(background):
     tv1 = get_treeview(data, settings_background)
 
     tv1.place(relheight=1, relwidth=1)
+    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
 
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
