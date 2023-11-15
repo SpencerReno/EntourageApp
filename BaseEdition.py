@@ -169,7 +169,7 @@ def hours_menu(main_background):
     menu_nails = tk.Button(menu_background, text='Nails', bg='DarkBlue', fg='white', command=lambda: nails())
     menu_nails.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
 
-    menu_massage = tk.Button(menu_background, text='Massage', bg='dim Grey', fg='white', command=lambda: massage())
+    menu_massage = tk.Button(menu_background, text='Massage', bg='dim Grey', fg='white', command=lambda: massage(menu_background))
     menu_massage.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
 
     back_button = tk.Button(menu_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear_main(menu_background))
@@ -346,33 +346,38 @@ def cos(background):
     tv1.place(relheight=1, relwidth=1)
 
 
-    # download_am = tk.Button(cos_background, text='Download AM', bg='black', fg='white', command= lambda: cos_data_creation('AM'))
-    # download_am.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
-
-    # download_pm = tk.Button(cos_background, text='Download PM', bg='black', fg='white', command= lambda: cos_data_creation('PM'))
-    # download_pm.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
-
     back_button = tk.Button(cos_hours_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear(cos_hours_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-def massage():
-    menu_background.destroy()
+def massage(background):
+    background.destroy()
+    massage_hrs = massage_online_hours()
+    print(massage_hrs)
+    massage_hours_background =tk.Label(blank_background, bg=main_color)
+    massage_hours_background.place(relheight=1, relwidth=1)
 
-    massage_background=tk.Label(blank_background, bg=main_color)
-    massage_background.place(relheight=1, relwidth=1)
-
-    entourage_logo = tk.Label(massage_background, width=w, height=h,image=EN_photo,bg=main_color)
-    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
-
-    massage_title = tk.Label(massage_background, text='MASSAGE', bg = main_color, fg='black', font=('Times', '36','bold'))
-    massage_title.place(relx=.15, rely=.05, relheight=.15, relwidth=.7)
-
-    download_am = tk.Button(massage_background, text='Download AM', bg='black', fg='white', command= lambda: massage_data_creation())
-    download_am.place(relheight=.1,relwidth=.25, relx=.37,rely=.6)
-
-    back_button = tk.Button(massage_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear(massage_background))
+    back_button = tk.Button(massage_hours_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(massage_hours_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
+    title_label = tk.Label(massage_hours_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
+
+
+    submit_button = tk.Button(massage_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1))
+    submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
+    
+
+    tv1 = get_treeview(massage_hrs, massage_hours_background)
+    
+    tv1.place(relheight=1, relwidth=1)
+
+    title_label.after(1000, new_hours_treeview(massage_hrs, massage_hours_background, tv1))
+
+    
+
+
+    back_button = tk.Button(massage_hours_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear(massage_hours_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 def nails():
     menu_background.destroy()
 
@@ -460,18 +465,6 @@ def edit_tree(tree, event):
     entry.bind('<FocusOut>', lambda e: entry.destroy())  
     entry.bind('<Return>', ok)  # validate with Enter
     entry.focus_set()
-
-
-
-def send_hours(tree):
-    row_list = []
-    cols = tree['columns']
-    for row in tree.get_children():
-        row_list.append(tree.item(row)['values'])
-    df = pd.DataFrame(row_list, columns=cols)
-
-    print(df)
-
 
 
 

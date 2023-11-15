@@ -276,13 +276,7 @@ def cos_online_hours():
 
     cos_data['Name']=cos_data['Name'].str.split(',').str[1]
     cos_data['Name'] = cos_data['Name'].str.split(' ').str[1]
-    # try:
-    #     cos_data['Tot hrs']=cos_data['Tot hrs'].str.replace(',', '')
-    #     cos_data['Tot hrs'] = cos_data['Tot hrs'].astype(float)
 
-
-    # except:
-    #     print('No Errors')
 
     cos_data.sort_values(by='Name', inplace=True)
 
@@ -358,9 +352,62 @@ def download_sr_pm(data):
         defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
     f.write(data)
 
+def massage_online_hours():
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv(url)
+    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Remain hrs', 'Tot hrs', 'Last name'], inplace=True)
+    massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
+
+    massage_data['Hours'] = "9:00 - 4:00"
+    massage_data['Date'] = ' '
+    massage_data['Homework Given'] =  ' '
 
 
-    
+    return massage_data
+
+
+
+
+def send_hours(tree):
+    row_list = []
+    cols = tree['columns']
+    for row in tree.get_children():
+        row_list.append(tree.item(row)['values'])
+    df = pd.DataFrame(row_list, columns=cols)
+    dowload_clock = get_download_clock_file(df)
+    hour_sheet =df 
+
+    print(hour_sheet)
+    print(dowload_clock)
+
+def get_download_clock_file(df):
+    df['Date']=df['Date'].replace(' ', np.nan)
+    df=df.dropna(axis=0)
+    clocked_hours = pd.DataFrame(columns=[0,1,2])
+
+    for x in range(0, len(df)):
+        student_id = df['Acct'].iloc[x]
+        month = df['Date'].iloc[x].split('/')[0]
+        day = df['Date'].iloc[x].split('/')[1]
+        year = df['Date'].iloc[x].split('/')[2][-2:]
+        out_time = int(df['Hours'].iloc[x].split('-')[1][1]) + 12
+        clocked_in = {
+            0 : 'PN00',
+            1 : f'{year}{month}{day}090000',
+            2: f'10000M00000{student_id}'
+        }
+
+        Clock_out = {
+            0 : 'PN00',
+            1 : f'{year}{month}{day}{str(out_time)}0000',
+            2: f'50000M00000{student_id}'
+        }
+
+        clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
+        clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
+
+    return clocked_hours
+
 
 
 
