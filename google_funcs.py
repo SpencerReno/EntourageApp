@@ -6,6 +6,7 @@ import re
 from datetime import date
 import datetime
 import calendar
+import numpy as np 
 
 def adding(text):
     total = 0
@@ -211,9 +212,9 @@ def esti_data_creation(course):
 
     def add_cols_am(data):
         if data['Tot hrs'].iloc[0] < 290:
-            data['hours'] =  '9:00 - 2:00'
+            data['hours'] =  '9:00 - 3:00'
         if data['Tot hrs'].iloc[0] > 290 and data['Tot hrs'].iloc[0] < 690:
-            data['Hours'] = '9:00 - 4:00'
+            data['Hours'] = '9:00 - 3:00'
 
         if data['Tot hrs'].iloc[0] >=690:
             data['Hours'] = '9:00 - 4:00'
@@ -264,7 +265,43 @@ def esti_data_creation(course):
         download_sr_am(sr_am)
     if course == 'sr_pm':
         download_sr_pm(sr_pm)
-            
+
+
+def cos_online_hours():
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv(url)
+    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Remain hrs', 'Tot hrs'], inplace=True)
+    cos_data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
+
+
+    cos_data['Name']=cos_data['Name'].str.split(',').str[1]
+    cos_data['Name'] = cos_data['Name'].str.split(' ').str[1]
+    # try:
+    #     cos_data['Tot hrs']=cos_data['Tot hrs'].str.replace(',', '')
+    #     cos_data['Tot hrs'] = cos_data['Tot hrs'].astype(float)
+
+
+    # except:
+    #     print('No Errors')
+
+    cos_data.sort_values(by='Name', inplace=True)
+
+    cos_full = cos_data[cos_data['Groups'] == 'Cosmetology Full Time']
+    cos_full.drop(columns=['Groups'], inplace=True)
+    cos_full['Hours'] = "9:00 - 4:00"
+    cos_full['Date'] = ' '
+    cos_full['Homework Given'] = ' '
+
+
+    
+    cos_part = cos_data[cos_data['Groups'] != 'Cosmetology Full Time']
+    cos_part.drop(columns=['Groups'], inplace=True)
+    cos_part['Hours'] = "5:30 - 9:30"
+    cos_part['Date'] = ' '
+    cos_part['Homework Given'] =  ' '
+
+
+    return cos_full, cos_part
 
 def download_fresh_am(data):
     data.reset_index(inplace=True)
