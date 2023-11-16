@@ -524,6 +524,62 @@ def get_treeview(data, background):
     return tv1 
 
 
+
+
+def send_hours(tree, course):
+    row_list = []
+    cols = tree['columns']
+    for row in tree.get_children():
+        row_list.append(tree.item(row)['values'])
+    df = pd.DataFrame(row_list, columns=cols)
+    try:
+        dowload_clock = get_download_clock_file(df)
+        hour_sheet =df 
+        dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
+        hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+
+        from_addr = 'eibehours@outlook.com'
+        to_addr = 'sreno@entouragebeauty.com'
+        subject = 'Hours'
+
+        msg = MIMEMultipart()
+        msg['From'] = from_addr
+        msg['To'] = to_addr
+        msg['Subject'] = subject
+        body = MIMEText(f'New {course} hours!', 'plain')
+
+        msg.attach(body)
+
+        time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
+
+        with open(time_clock_report, 'r+') as f:
+            attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
+            attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
+
+
+        hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
+
+        with open(hours_sheet_report, 'r') as f:
+            attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
+            attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+
+        msg.attach(attachment)
+        msg.attach(attachment2)
+        server = smtplib.SMTP('smtp.office365.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(from_addr, 'coldL!ght65#')
+        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        server.quit()
+        success_window()
+        
+    except: 
+        fail_window()
+
+
+
+
 def status_page(background):
     background.destroy()
     status_background=tk.Label(blank_background, bg=main_color)
@@ -764,9 +820,16 @@ def get_treeview(data, background):
 
 def success_window():
     top= tk.Toplevel(root)
-    top.geometry("750x250")
+    top.geometry("300x300")
     top.title("Child Window")
-    tk.Label(top, text= "Hello World!", font=('Mistral 18 bold')).place(x=150,y=80)
+    tk.Label(top, text= "Hours have been submited", font=('Times New Roman 18 bold')).place(x=150,y=80)
+
+def fail_window():
+    top= tk.Toplevel(root)
+    top.geometry("300x300")
+    top.title("Child Window")
+    tk.Label(top, text= "Failed to send Try Again", font=('Times New Roman 18 bold')).place(x=150,y=80)
+
 
 
 def clear(background):
