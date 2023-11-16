@@ -7,6 +7,15 @@ from datetime import date
 import datetime
 import calendar
 import numpy as np 
+import smtplib
+from email import message
+import getpass
+import smtplib
+from email import message
+from os.path import basename
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
 def adding(text):
     total = 0
@@ -24,7 +33,7 @@ def adding(text):
 def get_student_status(course):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs',], inplace=True)
     if course == 'Cos PT':
         data = data[data['Groups'] =='Cosmetology Part Time']   
     elif course == 'Cos FT':
@@ -148,14 +157,12 @@ def course_100_file(course):
 
 
 
-def esti_data_creation(course):  
-    orig_url='https://drive.google.com/file/d/1T24pGSkjlXvIAUKXG3WOMK3CBM2o1jKw/view?usp=sharing'
+def esti_online_hours():  
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv(url)
+    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Remain hrs'], inplace=True)
+    esti_data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
 
-    file_id = orig_url.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    esti_data = pd.read_csv(csv_raw)
     esti_data['Name']= esti_data['Name'].str.split(',').str[1]
     esti_data['Name'] = esti_data['Name'].str.split(' ').str[1]
 
@@ -171,7 +178,7 @@ def esti_data_creation(course):
     esti_data['Tot hrs'] = esti_data['Tot hrs'] + esti_data['Tran hrs']
 
 
-    esti_data.drop(columns=['Attend stat', 'Program', 'Tran hrs','Tran hrs/other school'],inplace=True)
+    esti_data.drop(columns=['Tran hrs'],inplace=True)
 
     esti_data.sort_values(by='Last name',inplace=True)
     esti_data['Tot hrs']=esti_data['Tot hrs'].astype(float)
@@ -253,24 +260,15 @@ def esti_data_creation(course):
     add_cols_am(sr_am)
     add_cols_pm(sr_pm)
 
-    if course == 'fresh_am':
-        download_fresh_am(fresh_am)
-    if course == 'fresh_pm':
-        download_fresh_pm(fresh_pm)
-    if course == 'jr_am':
-        download_jr_am(jr_am)
-    if course == 'jr_pm':
-        download_jr_pm(jr_pm)
-    if course == 'sr_am':
-        download_sr_am(sr_am)
-    if course == 'sr_pm':
-        download_sr_pm(sr_pm)
+    return fresh_am, fresh_pm, jr_am, jr_pm, sr_am, sr_pm
+
+
 
 
 def cos_online_hours():
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Remain hrs', 'Tot hrs'], inplace=True)
+    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Tran hrs', 'Remain hrs', 'Tot hrs'], inplace=True)
     cos_data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
 
 
@@ -297,65 +295,10 @@ def cos_online_hours():
 
     return cos_full, cos_part
 
-def download_fresh_am(data):
-    data.reset_index(inplace=True)
-    data.drop(columns='index', inplace=True)
-    data = data.to_csv(index=False,line_terminator='\n')
-
-    f = asksaveasfile(mode='w', initialfile = 'Esti_Fresh_AM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(data)
-
-
-def download_fresh_pm(data):
-    data.reset_index(inplace=True)
-    data.drop(columns='index', inplace=True)
-    data = data.to_csv(index=False,line_terminator='\n')
-
-    f = asksaveasfile(mode='w', initialfile = 'Esti_Fresh_PM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(data)
-
-def download_jr_am(data):
-    data.reset_index(inplace=True)
-    data.drop(columns='index', inplace=True)
-    data = data.to_csv(index=False,line_terminator='\n')
-
-    f = asksaveasfile(mode='w', initialfile = 'Esti_JR_AM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(data)
-
-def download_jr_pm(data):
-    data.reset_index(inplace=True)
-    data.drop(columns='index', inplace=True)
-    data = data.to_csv(index=False,line_terminator='\n')
-
-    f = asksaveasfile(mode='w', initialfile = 'Esti_JR_PM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(data)
-
-def download_sr_am(data):
-    data.reset_index(inplace=True)
-    data.drop(columns='index', inplace=True)
-    data = data.to_csv(index=False,line_terminator='\n')
-
-    f = asksaveasfile(mode='w', initialfile = 'Esti_SR_AM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(data)
-
-def download_sr_pm(data):
-    data.reset_index(inplace=True)
-    data.drop(columns='index', inplace=True)
-    data = data.to_csv(index=False,line_terminator='\n')
-
-    f = asksaveasfile(mode='w', initialfile = 'Esti_SR_PM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(data)
-
 def massage_online_hours():
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Remain hrs', 'Tot hrs', 'Last name'], inplace=True)
+    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %','Tran hrs', 'Remain hrs', 'Tot hrs', 'Last name'], inplace=True)
     massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
 
     massage_data['Hours'] = "9:00 - 4:00"
@@ -367,18 +310,91 @@ def massage_online_hours():
 
 
 
+def nails_online_hours():
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv(url)
+    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Tran hrs','Remain hrs', 'Tot hrs'], inplace=True)
+    nails_data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
 
-def send_hours(tree):
+
+    nails_data['Name']=nails_data['Name'].str.split(',').str[1]
+    nails_data['Name'] = nails_data['Name'].str.split(' ').str[1]
+
+
+    nails_data.sort_values(by='Name', inplace=True)
+
+    nails_full = nails_data[nails_data['Groups'] == 'Nails Full Time']
+    nails_full.drop(columns=['Groups'], inplace=True)
+    nails_full['Hours'] = "9:00 - 4:00"
+    nails_full['Date'] = ' '
+    nails_full['Homework Given'] = ' '
+
+
+    
+    nails_part= nails_data[nails_data['Groups'] != 'Nails Full Time']
+    nails_part.drop(columns=['Groups'], inplace=True)
+    nails_part['Hours'] = "5:30 - 9:30"
+    nails_part['Date'] = ' '
+    nails_part['Homework Given'] =  ' '
+
+
+    return nails_full, nails_part 
+    
+
+
+
+def send_hours(tree, course):
     row_list = []
     cols = tree['columns']
     for row in tree.get_children():
         row_list.append(tree.item(row)['values'])
     df = pd.DataFrame(row_list, columns=cols)
-    dowload_clock = get_download_clock_file(df)
-    hour_sheet =df 
 
-    print(hour_sheet)
-    print(dowload_clock)
+    try:
+        dowload_clock = get_download_clock_file(df)
+        hour_sheet =df 
+        dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
+        hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+
+        from_addr = 'eibehours@outlook.com'
+        to_addr = 'sreno@entouragebeauty.com'
+        subject = 'Hours'
+
+        msg = MIMEMultipart()
+        msg['From'] = from_addr
+        msg['To'] = to_addr
+        msg['Subject'] = subject
+        body = MIMEText(f'New {course} hours!', 'plain')
+
+        msg.attach(body)
+
+        time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
+
+        with open(time_clock_report, 'r') as f:
+            attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
+            attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
+
+
+        hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
+
+        with open(hours_sheet_report, 'r') as f:
+            attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
+            attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+
+        # msg.attach(attachment)
+        # msg.attach(attachment2)
+        # server = smtplib.SMTP('smtp.office365.com', 587)
+        # server.ehlo()
+        # server.starttls()
+        # server.ehlo()
+        # server.login(from_addr, 'coldL!ght65#')
+        # server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        # server.quit()
+        
+    except: 
+        print('ERROR ')
+
+
 
 def get_download_clock_file(df):
     df['Date']=df['Date'].replace(' ', np.nan)
@@ -412,134 +428,6 @@ def get_download_clock_file(df):
 
 
 
-
-
-
-
-def cos_data_creation(course):
-    orig_url='https://drive.google.com/file/d/1vm5CfMQOuGucKm4Zn0YA_XXPktmUaop4/view?usp=sharing'
-
-    file_id = orig_url.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    cos_data = pd.read_csv(csv_raw)
-
-    cos_data['Name']=cos_data['Name'].str.split(',').str[1]
-    cos_data['Name'] = cos_data['Name'].str.split(' ').str[1]
-    try:
-        cos_data['Tot hrs']=cos_data['Tot hrs'].str.replace(',', '')
-        cos_data['Tot hrs'] = cos_data['Tot hrs'].astype(float)
-
-
-    except:
-        print('No Errors')
-
-    cos_data.drop(columns=['Attend stat','Program','Course Version', 'Tot hrs'],inplace=True)
-    cos_data.sort_values(by='Name', inplace=True)
-
-    cos_full = cos_data[cos_data['Groups'] == 'Cosmetology Full Time']
-    cos_full.drop(columns=['Groups'], inplace=True)
-    cos_full['Hours'] = "9:00 - 4:00"
-    cos_full['Date'] = ' '
-    cos_full['Aissigned Work'] = ' '
-
-
-    
-    cos_part = cos_data[cos_data['Groups'] != 'Cosmetology Full Time']
-    cos_part.drop(columns=['Groups'], inplace=True)
-    cos_part['Hours'] = "5:30 - 9:30"
-    cos_part['Date'] = ' ' 
-    cos_part['Aissigned Work'] = ' '
-
-
-    cos_full.drop(columns=['Tran hrs', 'Tran hrs/other school'], inplace=True)
-    cos_part.drop(columns=['Tran hrs', 'Tran hrs/other school'], inplace=True)
-    cos_full.reset_index(inplace=True)
-    cos_full.drop(columns='index', inplace=True)
-    cos_full = cos_full.to_csv(index=False,line_terminator='\n')
-
-    cos_part.reset_index(inplace=True)
-    cos_part.drop(columns='index', inplace=True)
-    cos_part = cos_part.to_csv(index=False,line_terminator='\n')
-
-    if course == 'AM':
-        f = asksaveasfile(mode='w', initialfile = 'COS_AM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-        f.write(cos_full)
-    else:
-        f = asksaveasfile(mode='w', initialfile = 'COS_PM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-        f.write(cos_part)
-
-
-
-def nails_data_creation(course): 
-    orig_url='https://drive.google.com/file/d/1HPjhVRWNGUsuXoYAJ0eVGavinpcHZOAa/view?usp=sharing'
-    file_id = orig_url.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    nails_data = pd.read_csv(csv_raw) 
-    nails_data['Name']=nails_data['Name'].str.split(',').str[1]
-    nails_data['Name'] = nails_data['Name'].str.split(' ').str[1]
-    nails_data.drop(columns=['Attend stat','Program', 'Tot hrs'],inplace=True)
-    nails_am = nails_data[nails_data['Groups'] == 'Nails Full Time']
-    nails_pm = nails_data[nails_data['Groups'] == 'Nails Part Time']
-
-
-    nails_am.sort_values('Last name', inplace=True)
-    nails_pm.sort_values('Last name', inplace=True)
-
-    def pm_data(data):
-        data.drop(columns=['Groups'], inplace=True)
-        data['Hours'] = '5:30 - 9:30'
-        data['Date'] = ' '
-        data['Aissigned Work'] = ' '
-
-    def am_data(data):
-        data.drop(columns=['Groups'], inplace=True)
-        data['Hours'] = '9:00 - 4:00'
-        data['Date'] = ' '
-        data['Aissigned Work'] = ' '
-
-    pm_data(nails_pm)
-    am_data(nails_am)
-    nails_am.reset_index(inplace=True)
-    nails_am.drop(columns='index', inplace=True)
-    nails_am = nails_am.to_csv(index=False,line_terminator='\n')
-
-    nails_pm.reset_index(inplace=True)
-    nails_pm.drop(columns='index', inplace=True)
-    nails_pm = nails_pm.to_csv(index=False,line_terminator='\n')
-
-    if course == 'AM':
-        f = asksaveasfile(mode='w', initialfile = 'Nails_AM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-        f.write(nails_am)
-    else:
-        f = asksaveasfile(mode='w', initialfile = 'Nails_PM.csv',
-        defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-        f.write(nails_pm)
-
-def massage_data_creation():
-    orig_url='https://drive.google.com/file/d/1Mk_nIhyHHWIbfMSK92WU7mV3jpocfVZ-/view?usp=sharing'
-    file_id = orig_url.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    massage_data = pd.read_csv(csv_raw) 
-    massage_data.drop(columns=['Tot hrs', 'LDA hrs', 'Remain hrs','Atnd %'], inplace=True)
-    massage_data['Last'] = massage_data['Name'].str.split(',').str[0]
-    massage_data['Name'] = massage_data['Name'].str.split(',').str[1]
-    massage_data['Name'] = massage_data['Name'].str.split(' ').str[1]
-    massage_data['Hours'] = '9:00 - 4:00'
-    massage_data['Date'] = ' '
-    massage_data['Assigned Work'] = ' '
-    massage_data = massage_data.to_csv(index=False,line_terminator='\n')
-    f = asksaveasfile(mode='w', initialfile = 'Massage_Hours.csv',
-    defaultextension=".csv",filetypes=[("Microsoft Excel Comma Separated Values File","*.csv")])
-    f.write(massage_data)
 
 
 

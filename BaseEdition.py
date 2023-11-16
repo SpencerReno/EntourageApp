@@ -15,6 +15,9 @@ import json
 import subprocess
 from urllib.request import urlretrieve
 import getpass
+import smtplib
+from email import message
+
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
 
 
@@ -36,9 +39,6 @@ root = tk.Tk()
 root.config(bg=main_color)
 root.title("Entourage Hours Sheets")
 root.iconbitmap(resource_path('assets\\EIB_black_pink.ico'))
-
-
-
 blank_background = tk.Label(root, bg=main_color)
 blank_background.place(relheight=1, relwidth=1)
 
@@ -162,10 +162,10 @@ def hours_menu(main_background):
     menu_cos = tk.Button(menu_background, text='Cosmetology', bg='black', fg='white', command=lambda: cos(menu_background))
     menu_cos.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
 
-    menu_esti = tk.Button(menu_background, text='Esthetics', bg='maroon', fg='white', command=lambda: esti())
+    menu_esti = tk.Button(menu_background, text='Esthetics', bg='maroon', fg='white', command=lambda: esti(menu_background))
     menu_esti.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
 
-    menu_nails = tk.Button(menu_background, text='Nails', bg='DarkBlue', fg='white', command=lambda: nails())
+    menu_nails = tk.Button(menu_background, text='Nails', bg='DarkBlue', fg='white', command=lambda: nails(menu_background))
     menu_nails.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
 
     menu_massage = tk.Button(menu_background, text='Massage', bg='dim Grey', fg='white', command=lambda: massage(menu_background))
@@ -322,10 +322,7 @@ def cos(background):
     cos_hours_background =tk.Label(blank_background, bg=main_color)
     cos_hours_background.place(relheight=1, relwidth=1)
 
-    back_button = tk.Button(cos_hours_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(cos_hours_background))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
-
-    title_label = tk.Label(cos_hours_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label = tk.Label(cos_hours_background, text = 'Cosmetology Online Hours', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
    
@@ -336,7 +333,7 @@ def cos(background):
     cos_pm_view = tk.Button(cos_hours_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: new_hours_treeview(cos_part, cos_hours_background, tv1))
     cos_pm_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.88)
 
-    submit_button = tk.Button(cos_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1))
+    submit_button = tk.Button(cos_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Cosmetology'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
     
 
@@ -351,18 +348,14 @@ def cos(background):
 def massage(background):
     background.destroy()
     massage_hrs = massage_online_hours()
-    print(massage_hrs)
     massage_hours_background =tk.Label(blank_background, bg=main_color)
     massage_hours_background.place(relheight=1, relwidth=1)
 
-    back_button = tk.Button(massage_hours_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(massage_hours_background))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
-
-    title_label = tk.Label(massage_hours_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label = tk.Label(massage_hours_background, text = 'Massage Online Hours', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
 
-    submit_button = tk.Button(massage_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1))
+    submit_button = tk.Button(massage_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Massage'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
     
 
@@ -377,8 +370,9 @@ def massage(background):
 
     back_button = tk.Button(massage_hours_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear(massage_hours_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
-def nails():
-    menu_background.destroy()
+def nails(background):
+    background.destroy()
+    nails_full, nails_part = nails_online_hours()
 
     nails_background=tk.Label(blank_background, bg=main_color)
     nails_background.place(relheight=1, relwidth=1)
@@ -386,47 +380,69 @@ def nails():
     entourage_logo = tk.Label(nails_background, width=w, height=h,image=EN_photo,bg=main_color)
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
 
-    nails_title = tk.Label(nails_background, text='NAILS', bg = main_color, fg='black', font=('Times', '36','bold'))
-    nails_title.place(relx=.15, rely=.05, relheight=.15, relwidth=.7)
+    nails_title = tk.Label(nails_background, text='NAILS ONLINE HOURS', bg = main_color, fg='black', font=('Times', '36','bold'))
+    nails_title.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    download_am = tk.Button(nails_background, text='Download AM', bg='DarkBlue', fg='white',command= lambda: nails_data_creation('AM'))
-    download_am.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
+    nail_am_view = tk.Button(nails_background, text='Day Nails', bg='black', fg='white', command= lambda: new_hours_treeview(nails_full, nails_background, tv1))
+    nail_am_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.75)
 
-    download_pm = tk.Button(nails_background, text='Download PM', bg='DarkBlue', fg='white',command= lambda: nails_data_creation('PM'))
-    download_pm.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
+   
+    nail_pm_view = tk.Button(nails_background, text='Night Nails', bg='black', fg='white', command= lambda: new_hours_treeview(nails_part, nails_background, tv1))
+    nail_pm_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.88)
+
+    
+    submit_button = tk.Button(nails_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Nails'))
+    submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
+    
+
+    tv1 = get_treeview(nails_part, nails_background)
+    
+    tv1.place(relheight=1, relwidth=1)
+
+
 
     back_button = tk.Button(nails_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear(nails_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-def esti():
-    menu_background.destroy()
+def esti(background):
+    background.destroy()
+    fresh_am, fresh_pm, jr_am, jr_pm, sr_am, sr_pm = esti_online_hours()
+
 
     esti_background=tk.Label(blank_background, bg=main_color)
     esti_background.place(relheight=1, relwidth=1)
 
-    entourage_logo = tk.Label(esti_background, width=w, height=h,image=EN_photo,bg=main_color)
-    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
+    esti_title = tk.Label(esti_background, text='ESTHETICS ONLINE HOURS', bg = main_color, fg='black', font=('Times', '25','bold'))
+    esti_title.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    esti_title = tk.Label(esti_background, text='ESTHETICS', bg = main_color, fg='black', font=('Times', '36','bold'))
-    esti_title.place(relx=.15, rely=.05, relheight=.15, relwidth=.7)
+    esti_hours_FRam = tk.Button(esti_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: new_hours_treeview(fresh_am, esti_background, tv1))
+    esti_hours_FRam.place(relheight=.1,relwidth=.2, relx=.01,rely=.77)
 
-    download_FRam = tk.Button(esti_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: esti_data_creation('fresh_am'))
-    download_FRam.place(relheight=.1,relwidth=.25, relx=.23,rely=.55)
+    esti_hours_FRpm = tk.Button(esti_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: new_hours_treeview(fresh_pm, esti_background, tv1))
+    esti_hours_FRpm.place(relheight=.1,relwidth=.2, relx=.01,rely=.88)
 
-    download_FRpm = tk.Button(esti_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: esti_data_creation('fresh_pm'))
-    download_FRpm.place(relheight=.1,relwidth=.25, relx=.52,rely=.55)
+    esti_hours_JRam = tk.Button(esti_background, text='Junior AM', bg='maroon', fg='white', command= lambda: new_hours_treeview(jr_am, esti_background, tv1))
+    esti_hours_JRam.place(relheight=.1,relwidth=.2, relx=.23,rely=.77)
 
-    download_JRam = tk.Button(esti_background, text='Junior AM', bg='maroon', fg='white', command= lambda: esti_data_creation('jr_am'))
-    download_JRam.place(relheight=.1,relwidth=.25, relx=.23,rely=.68)
+    esti_hours_JRpm = tk.Button(esti_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: new_hours_treeview(jr_pm, esti_background, tv1))
+    esti_hours_JRpm.place(relheight=.1,relwidth=.2, relx=.23,rely=.88)
 
-    download_JRpm = tk.Button(esti_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: esti_data_creation('jr_pm'))
-    download_JRpm.place(relheight=.1,relwidth=.25, relx=.52,rely=.68)
+    esti_hours_SRam = tk.Button(esti_background, text='Senior AM', bg='maroon', fg='white', command= lambda: new_hours_treeview(sr_am, esti_background, tv1))
+    esti_hours_SRam.place(relheight=.1,relwidth=.2, relx=.45,rely=.77)
 
-    download_SRam = tk.Button(esti_background, text='Senior AM', bg='maroon', fg='white', command= lambda: esti_data_creation('sr_am'))
-    download_SRam.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
+    esti_hours_SRpm = tk.Button(esti_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: new_hours_treeview(sr_pm, esti_background, tv1))
+    esti_hours_SRpm.place(relheight=.1,relwidth=.2, relx=.45,rely=.88)
 
-    download_SRpm = tk.Button(esti_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: esti_data_creation('sr_pm'))
-    download_SRpm.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
+
+ 
+    submit_button = tk.Button(esti_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Esthetics'))
+    submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
+    
+
+    tv1 = get_treeview(fresh_am, esti_background)
+    
+    tv1.place(relheight=1, relwidth=1)
+
 
     back_button = tk.Button(esti_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear(esti_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
@@ -447,25 +463,65 @@ def new_hours_treeview(data, background, tree):
 
 
 def edit_tree(tree, event):
+
     if tree.identify_region(event.x, event.y) == 'cell':
         column = tree.identify_column(event.x)  # identify column
         item = tree.identify_row(event.y)  # identify item
         x, y, width, height = tree.bbox(item, column) 
         value = tree.set(item, column)
 
+
     def ok(event):
         tree.set(item, column, entry.get())
         entry.destroy()
+        next_item = tree.next(tree.focus())
+        tree.selection_set(next_item)
+
+
+        
+
+
 
     entry = ttk.Entry(tree)  # create edition entry
     entry.place(x=x, y=y, width=width, height=height,
                 anchor='nw')  # display entry on top of cell
     entry.insert(0, value)  # put former value in entry
     entry.bind('<FocusOut>', lambda e: entry.destroy())  
-    entry.bind('<Return>', ok)  # validate with Enter
+    entry.bind('<Return>', ok)
+    entry.bind('<Tab>', ok)  # validate with Enter
     entry.focus_set()
 
 
+def get_treeview(data, background):
+    data_frame = tk.LabelFrame(background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
+    tv1 = ttk.Treeview(data_frame)
+    
+
+    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
+    tv1.configure(yscrollcommand=treescrolly.set)
+    treescrolly.pack(side='right', fill='y')
+
+    tv1['column'] = list(data.columns)
+    for value in data.columns:
+        tv1.column(value, anchor='w')
+    tv1['show'] = 'headings'
+
+    for column in tv1['columns']:
+        tv1.heading(column, text=column)
+        tv1.column(column, width=data_frame.winfo_width())
+
+    df_rows = data.to_numpy().tolist()
+
+    for row in df_rows:
+        tv1.insert('', 'end', values=row)
+
+    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
+
+
+    return tv1 
 
 
 def status_page(background):
@@ -539,7 +595,7 @@ def status_show(course):
 def status_massage(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[data['Groups'] == 'Massage Therapy']
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
@@ -565,10 +621,12 @@ def status_massage(background):
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Groups'] = data['Groups'].str.replace('Cosmetology Full Time', 'FT')
+    data['Groups'] = data['Groups'].str.replace('Cosmetology Part Time', 'PT')
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -579,11 +637,11 @@ def status_cos(background):
     title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    cos_am = data[data['Groups'] == 'Cosmetology Full Time'].sort_values('Tot hrs', ascending=False)
+    cos_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
     cos_am_view = tk.Button(settings_background, text='Day Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_am, settings_background, tv1))
     cos_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    cos_pm = data[data['Groups'] == 'Cosmetology Part Time'].sort_values('Tot hrs', ascending=False)
+    cos_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
     cos_pm_view = tk.Button(settings_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm, settings_background, tv1))
     cos_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
@@ -597,10 +655,12 @@ def status_cos(background):
 def status_esti(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Groups'] = data['Groups'].str.replace('Esthetics Full Time', 'FT')
+    data['Groups'] = data['Groups'].str.replace('Esthetics Part Time', 'PT')
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -611,11 +671,11 @@ def status_esti(background):
     title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    esti_am = data[data['Groups'] == 'Esthetics Full Time'].sort_values('Tot hrs', ascending=False)
+    esti_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
     esti_am_view = tk.Button(settings_background, text='Day Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_am, settings_background, tv1))
     esti_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    esti_pm = data[data['Groups'] == 'Esthetics Part Time'].sort_values('Tot hrs', ascending=False)
+    esti_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
     esti_pm_view = tk.Button(settings_background, text='Night Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_pm, settings_background, tv1))
     esti_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
@@ -628,10 +688,12 @@ def status_esti(background):
 def status_nails(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Groups'] = data['Groups'].str.replace('Nails Full Time', 'FT')
+    data['Groups'] = data['Groups'].str.replace('Nails Part Time', 'PT')
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -642,11 +704,11 @@ def status_nails(background):
     title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    nail_am = data[data['Groups'] == 'Nails Full Time'].sort_values('Tot hrs', ascending=False)
+    nail_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
     nail_am_view = tk.Button(settings_background, text='Day Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_am, settings_background, tv1))
     nail_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    nail_pm = data[data['Groups'] == 'Nails Part Time'].sort_values('Tot hrs', ascending=False)
+    nail_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
     nail_pm_view = tk.Button(settings_background, text='Night Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_pm, settings_background, tv1))
     nail_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
@@ -697,15 +759,17 @@ def get_treeview(data, background):
     tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
     tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
 
+
     return tv1 
 
+def success_window():
+    top= tk.Toplevel(root)
+    top.geometry("750x250")
+    top.title("Child Window")
+    tk.Label(top, text= "Hello World!", font=('Mistral 18 bold')).place(x=150,y=80)
 
-
-def get_path(event):
-    pathLabel.configure(text = event.data)
 
 def clear(background):
-    #background.destroy()
     hours_menu(background)
 
 def clear_status(background):

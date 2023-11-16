@@ -18,6 +18,7 @@ import json
 import subprocess
 from urllib.request import urlretrieve
 import getpass
+import time
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
 
 
@@ -53,14 +54,16 @@ global settings_photo
 settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 
 
-def update_check():
+def update_page():
     print('checking for updates')
     root.geometry('300x300')
     main_background =tk.Label(blank_background, bg=main_color)
     main_background.place(relheight=1, relwidth=1)
     update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
     update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
+    update_label.after(1000, update_check(update_label, main_background))
 
+def update_check(update_label, main_background):
     url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
     info = requests.get(url).json()
     server_app_version = info['info']['APP_VERSION']
@@ -69,48 +72,17 @@ def update_check():
     local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
     local_info = json.load(local_info)
     local_app_version =local_info['info']['APP_VERSION']
-
     if server_app_version != local_app_version:
         update_label.config(text='UPDATE REQUIRED!!')
         update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_app())
         update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
+        os.system('python updater.py')
+        sys.exit()
 
 
     else:
         update_label.after(2000, show_menu)
     root.mainloop()
-
-def update_app():
-    url = 'https://github.com/SpencerReno/EntourageApp/raw/main/EntourageDirectors.exe'
-
-    print('File Downloading')
-
-    usrname = getpass.getuser()
-    destination = f'C:\\Users\\{usrname}\\Downloads\\EntourageApp.exe'
-
-    download = urlretrieve(url, destination)
-
-    print('File downloaded')
-    #delete_old()
-    install_new()
-
-def delete_old():
-    try:
-        cmd = f'C:\\Program Files (x86)\\EntourageDirectors\\unins000.exe'
-
-        returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-        print('returned value:', returned_value)
-
-        install_new()
-    except:
-        install_new()
-def install_new():
-    usrname = getpass.getuser()
-
-    cmd = f'C:\\Users\\{usrname}\\Downloads  EntourageApp.exe'
-
-    returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-    print('returned value:', returned_value)
 
 
 
@@ -1050,4 +1022,4 @@ def clear_main(background):
     background.destroy()
     show_menu()
 
-update_check()
+update_page()
