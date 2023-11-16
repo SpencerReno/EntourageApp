@@ -651,10 +651,12 @@ def status_show(course):
 def status_massage(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[data['Groups'] == 'Massage Therapy']
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
@@ -677,10 +679,12 @@ def status_massage(background):
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     data['Groups'] = data['Groups'].str.replace('Cosmetology Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Cosmetology Part Time', 'PT')
     background.destroy()
@@ -711,10 +715,12 @@ def status_cos(background):
 def status_esti(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     data['Groups'] = data['Groups'].str.replace('Esthetics Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Esthetics Part Time', 'PT')
     background.destroy()
@@ -744,10 +750,12 @@ def status_esti(background):
 def status_nails(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     data['Groups'] = data['Groups'].str.replace('Nails Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Nails Part Time', 'PT')
     background.destroy()

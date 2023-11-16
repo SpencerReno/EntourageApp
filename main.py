@@ -862,53 +862,59 @@ def get_treeview(data, background):
 
 
 def send_hours(tree, course):
-    row_list = []
-    cols = tree['columns']
-    for row in tree.get_children():
-        row_list.append(tree.item(row)['values'])
-    df = pd.DataFrame(row_list, columns=cols)
     try:
-        dowload_clock = get_download_clock_file(df)
-        hour_sheet =df 
-        dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
-        hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
-
-        from_addr = 'eibehours@outlook.com'
-        to_addr = 'sreno@entouragebeauty.com'
-        subject = 'Hours'
-
-        msg = MIMEMultipart()
-        msg['From'] = from_addr
-        msg['To'] = to_addr
-        msg['Subject'] = subject
-        body = MIMEText(f'New {course} hours!', 'plain')
-
-        msg.attach(body)
-
-        time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
-
-        with open(time_clock_report, 'r+') as f:
-            attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
-            attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
-
-
-        hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
-
-        with open(hours_sheet_report, 'r') as f:
-            attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
-            attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
-
-        msg.attach(attachment)
-        msg.attach(attachment2)
-        server = smtplib.SMTP('smtp.office365.com', 587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(from_addr, 'coldL!ght65#')
-        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
-        server.quit()
-        success_window()
         
+        row_list = []
+        cols = tree['columns']
+        for row in tree.get_children():
+            row_list.append(tree.item(row)['values'])
+        df = pd.DataFrame(row_list, columns=cols)
+        df['Date'] = pd.to_datetime(df['Date'])
+        print(df)
+        # try:
+        #     dowload_clock = get_download_clock_file(df)
+        #     hour_sheet =df 
+        #     dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
+        #     hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+
+        #     from_addr = 'eibehours@outlook.com'
+        #     to_addr = 'sreno@entouragebeauty.com'
+        #     subject = 'Hours'
+
+        #     msg = MIMEMultipart()
+        #     msg['From'] = from_addr
+        #     msg['To'] = to_addr
+        #     msg['Subject'] = subject
+        #     body = MIMEText(f'New {course} hours!', 'plain')
+
+        #     msg.attach(body)
+
+        #     time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
+
+        #     with open(time_clock_report, 'r+') as f:
+        #         attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
+        #         attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
+
+
+        #     hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
+
+        #     with open(hours_sheet_report, 'r') as f:
+        #         attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
+        #         attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+
+        #     msg.attach(attachment)
+        #     msg.attach(attachment2)
+        #     server = smtplib.SMTP('smtp.office365.com', 587)
+        #     server.ehlo()
+        #     server.starttls()
+        #     server.ehlo()
+        #     server.login(from_addr, 'coldL!ght65#')
+        #     server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        #     server.quit()
+        #     success_window()
+            
+        # except: 
+        #     fail_window()
     except: 
         fail_window()
 
@@ -985,10 +991,12 @@ def status_show(course):
 def status_massage(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[data['Groups'] == 'Massage Therapy']
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
@@ -1010,10 +1018,12 @@ def status_massage(background):
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1042,10 +1052,12 @@ def status_cos(background):
 def status_esti(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1073,10 +1085,12 @@ def status_esti(background):
 def status_nails(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs'], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
     data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data.drop(columns=['Tran hrs'],inplace=True)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)

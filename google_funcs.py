@@ -33,7 +33,8 @@ def adding(text):
 def get_student_status(course):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs',], inplace=True)
+    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev Grad']]
+
     if course == 'Cos PT':
         data = data[data['Groups'] =='Cosmetology Part Time']   
     elif course == 'Cos FT':
@@ -160,9 +161,8 @@ def course_100_file(course):
 def esti_online_hours():  
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Remain hrs'], inplace=True)
+    data = data[['Acct', 'Name', 'Last name', 'Groups', 'Tot hrs', 'Tran hrs']]
     esti_data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
-
     esti_data['Name']= esti_data['Name'].str.split(',').str[1]
     esti_data['Name'] = esti_data['Name'].str.split(' ').str[1]
 
@@ -268,7 +268,7 @@ def esti_online_hours():
 def cos_online_hours():
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Tran hrs', 'Remain hrs', 'Tot hrs'], inplace=True)
+    data = data[['Acct', 'Name', 'Last name', 'Groups']]
     cos_data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
 
 
@@ -298,7 +298,7 @@ def cos_online_hours():
 def massage_online_hours():
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %','Tran hrs', 'Remain hrs', 'Tot hrs', 'Last name'], inplace=True)
+    data = data[['Acct', 'Name', 'Last name', 'Groups']]
     massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
 
     massage_data['Hours'] = "9:00 - 4:00"
@@ -313,7 +313,7 @@ def massage_online_hours():
 def nails_online_hours():
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Balance', 'LDA hrs', 'Rev grad', 'Atnd %', 'Tran hrs','Remain hrs', 'Tot hrs'], inplace=True)
+    data = data[['Acct', 'Name', 'Last name', 'Groups']]
     nails_data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
 
 
