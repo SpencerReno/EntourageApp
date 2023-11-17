@@ -782,6 +782,7 @@ def success_window():
     top.title("Child Window")
     tk.Label(top, text= "Hours have been submited", font=('Times New Roman 18 bold')).place(x=150,y=80)
 
+
 def fail_window():
     top= tk.Toplevel(root)
     top.geometry("300x300")
