@@ -153,8 +153,12 @@ def course_100_file(course):
     url = requests.get(dwn_url).text
     csv_raw = StringIO(url)
     data = pd.read_csv(csv_raw)
-    data['Remain hrs'] = data['Remain hrs'].str.replace(',', '')
-    return data 
+    try:
+        data['Remain hrs'] = data['Remain hrs'].str.replace(',', '')
+        return data
+    except:
+        return data
+    
 
 
 
