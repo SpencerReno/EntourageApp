@@ -462,42 +462,11 @@ def new_hours_treeview(data, background, tree):
 
 
 
-def edit_tree(tree, event):
-
-    if tree.identify_region(event.x, event.y) == 'cell':
-        column = tree.identify_column(event.x)  # identify column
-        item = tree.identify_row(event.y)  # identify item
-        x, y, width, height = tree.bbox(item, column) 
-        value = tree.set(item, column)
-
-
-    def ok(event):
-        tree.set(item, column, entry.get())
-        entry.destroy()
-        next_item = tree.next(tree.focus())
-        tree.selection_set(next_item)
-
-
-        
-
-
-
-    entry = ttk.Entry(tree)  # create edition entry
-    entry.place(x=x, y=y, width=width, height=height,
-                anchor='nw')  # display entry on top of cell
-    entry.insert(0, value)  # put former value in entry
-    entry.bind('<FocusOut>', lambda e: entry.destroy())  
-    entry.bind('<Return>', ok)
-    entry.bind('<Tab>', ok)  # validate with Enter
-    entry.focus_set()
-
-
 def get_treeview(data, background):
     data_frame = tk.LabelFrame(background)
-    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+    data_frame.place(rely=0.1, relx=0, relheight=.65, relwidth=1)
 
     tv1 = ttk.Treeview(data_frame)
-    
 
     treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
     tv1.configure(yscrollcommand=treescrolly.set)
@@ -517,12 +486,34 @@ def get_treeview(data, background):
     for row in df_rows:
         tv1.insert('', 'end', values=row)
 
-    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
-    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
+    tv1.bind("<1>", lambda event: edit_tree(tv1, event))
+
+    return tv1
 
 
-    return tv1 
+def edit_tree(tree, event):
 
+    if tree.identify_region(event.x, event.y) == 'cell':
+        column = tree.identify_column(event.x)  # identify column
+        item = tree.identify_row(event.y) 
+        x, y, width, height = tree.bbox(item, column) 
+        value = tree.set(item, column)
+
+
+    def ok(event):
+        tree.set(item, column, entry.get())
+        entry.destroy()
+
+
+
+    entry = ttk.Entry(tree)  # create edition entry
+    entry.place(x=x, y=y, width=width, height=height,
+                anchor='nw')  # display entry on top of cell
+    entry.insert(0, value)  # put former value in entry
+    entry.bind('<FocusOut>', lambda e: entry.destroy())  
+    entry.bind('<Return>', ok)
+    entry.bind('<Tab>', ok)  # validate with Enter
+    entry.focus_set()
 
 
 
@@ -651,12 +642,10 @@ def status_show(course):
 def status_massage(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[data['Groups'] == 'Massage Therapy']
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
-    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
     data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
@@ -679,12 +668,10 @@ def status_massage(background):
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
-    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
     data['Groups'] = data['Groups'].str.replace('Cosmetology Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Cosmetology Part Time', 'PT')
     background.destroy()
@@ -715,12 +702,10 @@ def status_cos(background):
 def status_esti(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
-    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
     data['Groups'] = data['Groups'].str.replace('Esthetics Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Esthetics Part Time', 'PT')
     background.destroy()
@@ -750,12 +735,10 @@ def status_esti(background):
 def status_nails(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
     data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
-    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
     data['Groups'] = data['Groups'].str.replace('Nails Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Nails Part Time', 'PT')
     background.destroy()
@@ -792,39 +775,6 @@ def get_small_treeview(data, background, tree):
         tree.insert('', 'end', values=row)
 
 
-
-
-
-def get_treeview(data, background):
-    data_frame = tk.LabelFrame(background)
-    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
-
-    tv1 = ttk.Treeview(data_frame)
-    
-
-    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
-    tv1.configure(yscrollcommand=treescrolly.set)
-    treescrolly.pack(side='right', fill='y')
-
-    tv1['column'] = list(data.columns)
-    for value in data.columns:
-        tv1.column(value, anchor='w')
-    tv1['show'] = 'headings'
-
-    for column in tv1['columns']:
-        tv1.heading(column, text=column)
-        tv1.column(column, width=data_frame.winfo_width())
-
-    df_rows = data.to_numpy().tolist()
-
-    for row in df_rows:
-        tv1.insert('', 'end', values=row)
-
-    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
-    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
-
-
-    return tv1 
 
 def success_window():
     top= tk.Toplevel(root)
