@@ -352,26 +352,54 @@ def get_download_clock_file(df):
     df=df.dropna(axis=0)
     clocked_hours = pd.DataFrame(columns=[0,1,2])
 
+
     for x in range(0, len(df)):
-        student_id = df['Acct'].iloc[x]
-        month = df['Date'].iloc[x].split('/')[0]
-        day = df['Date'].iloc[x].split('/')[1]
-        year = df['Date'].iloc[x].split('/')[2][-2:]
-        out_time = int(df['Hours'].iloc[x].split('-')[1][1]) + 12
-        clocked_in = {
-            0 : 'PN00',
-            1 : f'{year}{month}{day}090000',
-            2: f'10000M00000{student_id}'
-        }
+        try:
+            df['Date'] = df['Date'].iloc[x].replace(" ", '')
+            dates = df['Date'].iloc[x].split('-')
+            student_id = df['Acct'].iloc[x]
+            for date in dates:
+                month = date.split('/')[0]
+                day = date.split('/')[1]
+                year = date.split('/')[2][-2:]
+                out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
+                clocked_in = {
+                0 : 'PN00',
+                1 : f'{year}{month}{day}090000',
+                2: f'10000M00000{student_id}'
+                }
 
-        Clock_out = {
-            0 : 'PN00',
-            1 : f'{year}{month}{day}{str(out_time)}0000',
-            2: f'50000M00000{student_id}'
-        }
+                Clock_out = {
+                    0 : 'PN00',
+                    1 : f'{year}{month}{day}{str(out_time)}0000',
+                    2: f'50000M00000{student_id}'
+                }
+                
+                clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
+                clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
 
-        clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
-        clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
+        except:
+            student_id = df['Acct'].iloc[x]
+            month = df['Date'].iloc[x].split('/')[0]
+            day = df['Date'].iloc[x].split('/')[1]
+            year = df['Date'].iloc[x].split('/')[2][-2:]
+            out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
+
+        
+            clocked_in = {
+                0 : 'PN00',
+                1 : f'{year}{month}{day}090000',
+                2: f'10000M00000{student_id}'
+            }
+
+            Clock_out = {
+                0 : 'PN00',
+                1 : f'{year}{month}{day}{str(out_time)}0000',
+                2: f'50000M00000{student_id}'
+            }
+
+            clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
+            clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
 
     return clocked_hours
 
