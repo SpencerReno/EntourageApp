@@ -783,7 +783,6 @@ def esti(background):
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
 
-
 def new_hours_treeview(data, background, tree):
     for item in tree.get_children():
       tree.delete(item)
@@ -797,42 +796,11 @@ def new_hours_treeview(data, background, tree):
 
 
 
-def edit_tree(tree, event):
-
-    if tree.identify_region(event.x, event.y) == 'cell':
-        column = tree.identify_column(event.x)  # identify column
-        item = tree.identify_row(event.y)  # identify item
-        x, y, width, height = tree.bbox(item, column) 
-        value = tree.set(item, column)
-
-
-    def ok(event):
-        tree.set(item, column, entry.get())
-        entry.destroy()
-        next_item = tree.next(tree.focus())
-        tree.selection_set(next_item)
-
-
-        
-
-
-
-    entry = ttk.Entry(tree)  # create edition entry
-    entry.place(x=x, y=y, width=width, height=height,
-                anchor='nw')  # display entry on top of cell
-    entry.insert(0, value)  # put former value in entry
-    entry.bind('<FocusOut>', lambda e: entry.destroy())  
-    entry.bind('<Return>', ok)
-    entry.bind('<Tab>', ok)  # validate with Enter
-    entry.focus_set()
-
-
 def get_treeview(data, background):
     data_frame = tk.LabelFrame(background)
-    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+    data_frame.place(rely=0.1, relx=0, relheight=.65, relwidth=1)
 
     tv1 = ttk.Treeview(data_frame)
-    
 
     treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
     tv1.configure(yscrollcommand=treescrolly.set)
@@ -852,72 +820,115 @@ def get_treeview(data, background):
     for row in df_rows:
         tv1.insert('', 'end', values=row)
 
-    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
-    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
+    tv1.bind("<1>", lambda event: edit_tree(tv1, event))
 
-
-    return tv1 
-
+    return tv1
 
 
 
-def send_hours(tree, course):
-    try:
-        
-        row_list = []
-        cols = tree['columns']
-        for row in tree.get_children():
-            row_list.append(tree.item(row)['values'])
-        df = pd.DataFrame(row_list, columns=cols)
-        df['Date'] = pd.to_datetime(df['Date'])
-        print(df)
-        # try:
-        #     dowload_clock = get_download_clock_file(df)
-        #     hour_sheet =df 
-        #     dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
-        #     hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+def edit_tree(tree, event):
 
-        #     from_addr = 'eibehours@outlook.com'
-        #     to_addr = 'sreno@entouragebeauty.com'
-        #     subject = 'Hours'
-
-        #     msg = MIMEMultipart()
-        #     msg['From'] = from_addr
-        #     msg['To'] = to_addr
-        #     msg['Subject'] = subject
-        #     body = MIMEText(f'New {course} hours!', 'plain')
-
-        #     msg.attach(body)
-
-        #     time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
-
-        #     with open(time_clock_report, 'r+') as f:
-        #         attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
-        #         attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
+    if tree.identify_region(event.x, event.y) == 'cell':
+        column = tree.identify_column(event.x)  # identify column
+        item = tree.identify_row(event.y) 
+        x, y, width, height = tree.bbox(item, column) 
+        value = tree.set(item, column)
+        place_entry(tree, x, y, width, height,value, item, column, event)
 
 
-        #     hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
+def place_entry(tree, x, y, width, height,value, item, column, event):
 
-        #     with open(hours_sheet_report, 'r') as f:
-        #         attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
-        #         attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+    entry = ttk.Entry(tree)  # create edition entry
+    entry.place(x=x, y=y, width=width, height=height,
+                anchor='nw')  # display entry on top of cell
+    entry.insert(0, value)  # put former value in entry
+    entry.bind('<FocusOut>', lambda e: entry.destroy())  
+    entry.bind('<Return>', lambda x: ok_down(tree, item, column, entry, event))
+    entry.bind('<Tab>', lambda x: ok_down(tree, item, column, entry, event))
+    entry.bind('<Down>', lambda x: ok_down(tree, item, column, entry, event)) 
+    entry.bind('<Up>', lambda x: ok_up(tree, item, column, entry, event)) 
+    entry.focus_set()
 
-        #     msg.attach(attachment)
-        #     msg.attach(attachment2)
-        #     server = smtplib.SMTP('smtp.office365.com', 587)
-        #     server.ehlo()
-        #     server.starttls()
-        #     server.ehlo()
-        #     server.login(from_addr, 'coldL!ght65#')
-        #     server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
-        #     server.quit()
-        #     success_window()
+def ok_up(tree, item, column, entry, event):
+    tree.set(item, column, entry.get())
+    entry.destroy()
+    tab_up(tree,column, event) 
+
+def tab_up(tree,column, event):
+    current_item = tree.focus()
+    next_item = tree.prev(current_item)
+    current_item = tree.focus(next_item)
+    tree.selection_set(next_item)
+    x, y, width, height = tree.bbox(next_item, column) 
+    value = tree.set(next_item, column)
+    place_entry(tree, x, y, width, height,value, next_item, column, event)
+
+def ok_down(tree, item, column, entry, event):
+    tree.set(item, column, entry.get())
+    entry.destroy()
+    tab_down(tree,column, event) 
             
-        # except: 
-        #     fail_window()
+def tab_down(tree,column, event):
+    current_item = tree.focus()
+    next_item = tree.next(current_item)
+    current_item = tree.focus(next_item)
+    tree.selection_set(next_item)
+    x, y, width, height = tree.bbox(next_item, column) 
+    value = tree.set(next_item, column)
+    place_entry(tree, x, y, width, height,value, next_item, column, event)
+    
+
+    
+def send_hours(tree, course):
+    row_list = []
+    cols = tree['columns']
+    for row in tree.get_children():
+        row_list.append(tree.item(row)['values'])
+    df = pd.DataFrame(row_list, columns=cols)
+    try:
+        dowload_clock = get_download_clock_file(df)
+        hour_sheet =df 
+        dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
+        hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+
+        from_addr = 'eibehours@outlook.com'
+        to_addr = 'sreno@entouragebeauty.com'
+        subject = 'Hours'
+
+        msg = MIMEMultipart()
+        msg['From'] = from_addr
+        msg['To'] = to_addr
+        msg['Subject'] = subject
+        body = MIMEText(f'New {course} hours!', 'plain')
+
+        msg.attach(body)
+
+        time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
+
+        with open(time_clock_report, 'r+') as f:
+            attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
+            attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
+
+
+        hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
+
+        with open(hours_sheet_report, 'r') as f:
+            attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
+            attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+
+        msg.attach(attachment)
+        msg.attach(attachment2)
+        server = smtplib.SMTP('smtp.office365.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(from_addr, 'coldL!ght65#')
+        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        server.quit()
+        success_window()
+        
     except: 
         fail_window()
-
 
 
 def status_page(background):
