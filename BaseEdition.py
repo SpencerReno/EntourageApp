@@ -491,6 +491,7 @@ def get_treeview(data, background):
     return tv1
 
 
+##### ADD CLAUS FOR CHECKING DATE FORMAT AND POST ERROR IF INCORRECT 
 def edit_tree(tree, event):
 
     if tree.identify_region(event.x, event.y) == 'cell':
@@ -498,25 +499,52 @@ def edit_tree(tree, event):
         item = tree.identify_row(event.y) 
         x, y, width, height = tree.bbox(item, column) 
         value = tree.set(item, column)
+        place_entry(tree, x, y, width, height,value, item, column, event)
 
 
-    def ok(event):
-        tree.set(item, column, entry.get())
-        entry.destroy()
-
-
+def place_entry(tree, x, y, width, height,value, item, column, event):
 
     entry = ttk.Entry(tree)  # create edition entry
     entry.place(x=x, y=y, width=width, height=height,
                 anchor='nw')  # display entry on top of cell
     entry.insert(0, value)  # put former value in entry
     entry.bind('<FocusOut>', lambda e: entry.destroy())  
-    entry.bind('<Return>', ok)
-    entry.bind('<Tab>', ok)  # validate with Enter
+    entry.bind('<Return>', lambda x: ok_down(tree, item, column, entry, event))
+    entry.bind('<Tab>', lambda x: ok_down(tree, item, column, entry, event))
+    entry.bind('<Down>', lambda x: ok_down(tree, item, column, entry, event)) 
+    entry.bind('<Up>', lambda x: ok_up(tree, item, column, entry, event)) 
     entry.focus_set()
 
+def ok_up(tree, item, column, entry, event):
+    tree.set(item, column, entry.get())
+    entry.destroy()
+    tab_up(tree,column, event) 
 
+def tab_up(tree,column, event):
+    current_item = tree.focus()
+    next_item = tree.prev(current_item)
+    current_item = tree.focus(next_item)
+    tree.selection_set(next_item)
+    x, y, width, height = tree.bbox(next_item, column) 
+    value = tree.set(next_item, column)
+    place_entry(tree, x, y, width, height,value, next_item, column, event)
 
+def ok_down(tree, item, column, entry, event):
+    tree.set(item, column, entry.get())
+    entry.destroy()
+    tab_down(tree,column, event) 
+            
+def tab_down(tree,column, event):
+    current_item = tree.focus()
+    next_item = tree.next(current_item)
+    current_item = tree.focus(next_item)
+    tree.selection_set(next_item)
+    x, y, width, height = tree.bbox(next_item, column) 
+    value = tree.set(next_item, column)
+    place_entry(tree, x, y, width, height,value, next_item, column, event)
+    
+
+    
 def send_hours(tree, course):
     row_list = []
     cols = tree['columns']
