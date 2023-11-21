@@ -64,13 +64,8 @@ def get_student_status(course):
 
 
 def get_unpaid_students():
-    url ='https://drive.google.com/file/d/1buS_BepyluxxeN1XS87vH6PC-RmBybmI/view?usp=sharing'
-    file_id = url.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    data = pd.read_csv(csv_raw)
-
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv('./CSV Files/Ledger.csv')  
     student_column = data.columns[8]
     student_ids_column =data.columns[5]
     data.rename(columns={data.columns[4]: 'Dates'}, inplace=True)
@@ -139,20 +134,17 @@ def get_unpaid_students():
     return Final_df
 
 def course_100_file(course):
+    url  = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    data = pd.read_csv(url)
     if course == 'Cos':
-        url = 'https://drive.google.com/file/d/15ZJdQJdJzQnPLVf6cKBXs8UQgpUm9WXj/view?usp=sharing'
+        data = data[(data['Groups']=='Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     if course == 'Esti':
-        url = 'https://drive.google.com/file/d/1XUI-2h8oavIXlkY5SgLHlj0MCxw-IuZw/view?usp=sharing'
+        data = data[(data['Groups']=='Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     if course == 'Nails':
-        url = 'https://drive.google.com/file/d/1yIsDhgD1e2msO7nlIolVFFLzM8bxLbhz/view?usp=sharing'
+        data = data[(data['Groups']=='Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     if course == 'Massage':
-        url = 'https://drive.google.com/file/d/1JjoJggNgSMR3aMHG7YCogzHNMDQcJOfE/view?usp=sharing'
+        data = data[data['Groups']=='Massage Therapy']
         
-    file_id = url.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    data = pd.read_csv(csv_raw)
     try:
         data['Remain hrs'] = data['Remain hrs'].str.replace(',', '')
         return data
@@ -225,10 +217,10 @@ def esti_online_hours():
         if data['Tot hrs'].iloc[0] < 290:
             data['hours'] =  '9:00 - 3:00'
         if data['Tot hrs'].iloc[0] > 290 and data['Tot hrs'].iloc[0] < 690:
-            data['Hours'] = '9:00 - 3:00'
+            data['hours'] = '9:00 - 3:00'
 
         if data['Tot hrs'].iloc[0] >=690:
-            data['Hours'] = '9:00 - 4:00'
+            data['hours'] = '9:00 - 4:00'
 
         
         data['Date'] = ' '
@@ -243,10 +235,10 @@ def esti_online_hours():
         if data['Tot hrs'].iloc[0] < 290:
             data['hours'] =  '4:30 - 9:30'
         if data['Tot hrs'].iloc[0] > 290 and data['Tot hrs'].iloc[0] < 690:
-            data['Hours'] = '4:30 - 9:30'
+            data['hours'] = '4:30 - 9:30'
         
         if data['Tot hrs'].iloc[0] >= 690:
-            data['Hours'] = '4:30 - 9:30'
+            data['hours'] = '4:30 - 9:30'
             
 
         
@@ -284,7 +276,7 @@ def cos_online_hours():
 
     cos_full = cos_data[cos_data['Groups'] == 'Cosmetology Full Time']
     cos_full.drop(columns=['Groups'], inplace=True)
-    cos_full['Hours'] = "9:00 - 4:00"
+    cos_full['hours'] = "9:00 - 4:00"
     cos_full['Date'] = ' '
     cos_full['Homework Given'] = ' '
 
@@ -292,7 +284,7 @@ def cos_online_hours():
     
     cos_part = cos_data[cos_data['Groups'] != 'Cosmetology Full Time']
     cos_part.drop(columns=['Groups'], inplace=True)
-    cos_part['Hours'] = "5:30 - 9:30"
+    cos_part['hours'] = "5:30 - 9:30"
     cos_part['Date'] = ' '
     cos_part['Homework Given'] =  ' '
 
@@ -305,7 +297,7 @@ def massage_online_hours():
     data = data[['Acct', 'Name', 'Last name', 'Groups']]
     massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
 
-    massage_data['Hours'] = "9:00 - 4:00"
+    massage_data['hours'] = "9:00 - 4:00"
     massage_data['Date'] = ' '
     massage_data['Homework Given'] =  ' '
 
@@ -329,7 +321,7 @@ def nails_online_hours():
 
     nails_full = nails_data[nails_data['Groups'] == 'Nails Full Time']
     nails_full.drop(columns=['Groups'], inplace=True)
-    nails_full['Hours'] = "9:00 - 4:00"
+    nails_full['hours'] = "9:00 - 4:00"
     nails_full['Date'] = ' '
     nails_full['Homework Given'] = ' '
 
@@ -337,7 +329,7 @@ def nails_online_hours():
     
     nails_part= nails_data[nails_data['Groups'] != 'Nails Full Time']
     nails_part.drop(columns=['Groups'], inplace=True)
-    nails_part['Hours'] = "5:30 - 9:30"
+    nails_part['hours'] = "5:30 - 9:30"
     nails_part['Date'] = ' '
     nails_part['Homework Given'] =  ' '
 
@@ -351,12 +343,14 @@ def get_download_clock_file(df):
     df['Date']=df['Date'].replace(' ', np.nan)
     df=df.dropna(axis=0)
     clocked_hours = pd.DataFrame(columns=[0,1,2])
-
-
     for x in range(0, len(df)):
         try:
             df['Date'] = df['Date'].iloc[x].replace(" ", '')
-            dates = df['Date'].iloc[x].split('-')
+            if df['Date'].iloc[x].contains('&'): #find a way to handle & 
+                dates = df['Date'].iloc[x].split('&')
+                print('here', dates)
+            else:
+                dates = df['Date'].iloc[x].split('-')
             student_id = df['Acct'].iloc[x]
             for date in dates:
                 month = date.split('/')[0]
@@ -373,18 +367,19 @@ def get_download_clock_file(df):
                     0 : 'PN00',
                     1 : f'{year}{month}{day}{str(out_time)}0000',
                     2: f'50000M00000{student_id}'
-                }
+                }   
                 
                 clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
                 clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
-
+                
         except:
+            
             student_id = df['Acct'].iloc[x]
             month = df['Date'].iloc[x].split('/')[0]
             day = df['Date'].iloc[x].split('/')[1]
             year = df['Date'].iloc[x].split('/')[2][-2:]
+            print(df['hours'].iloc[x].split('-')[1][1])
             out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
-
         
             clocked_in = {
                 0 : 'PN00',
@@ -401,7 +396,11 @@ def get_download_clock_file(df):
             clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
             clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
 
+
     return clocked_hours
+
+
+
 
 
 
