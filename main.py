@@ -230,6 +230,7 @@ def add_totals(text, total_display):
 
 
 def your_copy(tree, event):
+    print('here copy')
     sel = tree.selection() # get selected items
     root.clipboard_clear()  # clear clipboard
     # copy headers
