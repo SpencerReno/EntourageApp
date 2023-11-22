@@ -17,6 +17,10 @@ from urllib.request import urlretrieve
 import getpass
 import smtplib
 from email import message
+from os.path import basename
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
 
@@ -615,17 +619,17 @@ def send_hours(tree, course):
         with open(hours_sheet_report, 'r') as f:
             attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
             attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
-
-        # msg.attach(attachment)
-        # msg.attach(attachment2)
-        # server = smtplib.SMTP('smtp.office365.com', 587)
-        # server.ehlo()
-        # server.starttls()
-        # server.ehlo()
-        # server.login(from_addr, 'coldL!ght65#')
-        # server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
-        # server.quit()
-        # success_window()
+        msg.attach(attachment)
+        msg.attach(attachment2)
+        server = smtplib.SMTP('smtp.office365.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(from_addr, 'coldL!ght65#')
+        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        print('here',  server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr]))
+        server.quit()
+        success_window()
     
     except: 
         fail_window()
