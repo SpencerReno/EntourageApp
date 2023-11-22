@@ -1,5 +1,4 @@
 import tkinter as tk 
-#from PIL import ImageTk, Image
 from google_funcs import *
 from tkinter.filedialog import asksaveasfile
 from tkinter import ttk, filedialog, messagebox
@@ -11,14 +10,17 @@ import requests
 from io import StringIO
 from tkinter.filedialog import asksaveasfile
 from datetime import date
-import datetime
-import calendar
-import pyperclip 
 import json
 import subprocess
 from urllib.request import urlretrieve
 import getpass
 import time
+import smtplib
+from email import message
+from os.path import basename
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
 
 
@@ -887,9 +889,10 @@ def send_hours(tree, course):
         row_list.append(tree.item(row)['values'])
     df = pd.DataFrame(row_list, columns=cols)
     try:
-        dowload_clock = get_download_clock_file(df)
+        download_clock= get_download_clock_file(df)
+        print(download_clock)
         hour_sheet =df 
-        dowload_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
+        download_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
         hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
 
         from_addr = 'eibehours@outlook.com'
@@ -927,7 +930,7 @@ def send_hours(tree, course):
         server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
         server.quit()
         success_window()
-        
+    
     except: 
         fail_window()
 
@@ -1173,16 +1176,10 @@ def get_treeview(data, background):
     return tv1 
 
 def success_window():
-    top= tk.Toplevel(root)
-    top.geometry("300x300")
-    top.title("Child Window")
-    tk.Label(top, text= "Hours have been submited").place(relx=.35,rely=.5, relheight=.65,relwidth=.5)
+    messagebox.showinfo("showinfo", "Hours Have Been Submitted!") 
 
 def fail_window():
-    top= tk.Toplevel(root)
-    top.geometry("300x300")
-    top.title("Child Window")
-    tk.Label(top, text= "Failed to send Try Again").place(relx=.35,rely=.5, relheight=.65,relwidth=.5)
+    messagebox.showerror("showerror", "Error Check Date Format is\n MM/DD/YY or \n MM/DD/YY - MM/DD/YY for two days") 
 
 
 def update_app(background):
