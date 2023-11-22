@@ -346,11 +346,11 @@ def get_download_clock_file(df):
     for x in range(0, len(df)):
         try:
             df['Date'] = df['Date'].iloc[x].replace(" ", '')
-            if df['Date'].iloc[x].contains('&'): #find a way to handle & 
+            if '&' in df['Date'].iloc[x]: #find a way to handle & 
                 dates = df['Date'].iloc[x].split('&')
-                print('here', dates)
             else:
                 dates = df['Date'].iloc[x].split('-')
+
             student_id = df['Acct'].iloc[x]
             for date in dates:
                 month = date.split('/')[0]
