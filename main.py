@@ -21,6 +21,9 @@ from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+import configparser
+
+
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
 
 
@@ -116,7 +119,7 @@ def show_menu():
     status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
     status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
 
-    update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: update_app(main_background))
+    update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: update_app_page(main_background))
     update_button.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
 
 
@@ -881,6 +884,7 @@ def tab_down(tree,column, event):
     place_entry(tree, x, y, width, height,value, next_item, column, event)
     
 
+ 
     
 def send_hours(tree, course):
     row_list = []
@@ -894,9 +898,11 @@ def send_hours(tree, course):
         hour_sheet =df 
         download_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
         hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+        url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+        info = requests.get(url).json()
 
         from_addr = 'eibehours@outlook.com'
-        to_addr = 'sreno@entouragebeauty.com'
+        to_addr = info['info']['HOURS_EMAIL']
         subject = 'Hours'
 
         msg = MIMEMultipart()
@@ -919,7 +925,6 @@ def send_hours(tree, course):
         with open(hours_sheet_report, 'r') as f:
             attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
             attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
-
         msg.attach(attachment)
         msg.attach(attachment2)
         server = smtplib.SMTP('smtp.office365.com', 587)
@@ -1182,7 +1187,7 @@ def fail_window():
     messagebox.showerror("showerror", "Error Check Date Format is\n MM/DD/YY or \n MM/DD/YY - MM/DD/YY for two days") 
 
 
-def update_app(background):
+def update_app_page(background):
     background.destroy()
     update_background =tk.Label(blank_background, bg=main_color)
     update_background.place(relheight=1, relwidth=1)
@@ -1193,11 +1198,22 @@ def update_app(background):
     title_label = tk.Label(update_background, text = 'Application Update', bg=main_color, fg='black', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
+    upload_button = tk.Button(update_background, text= 'Upload Files', bg='black', fg='white',activebackground='black', command= lambda: get_user_file(update_background))
+    upload_button.place(relheight=.1,relwidth=.1, relx=.45,rely=.5)
 
-    data_entry_frame = tk.LabelFrame(update_background)
-    data_entry_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
+def get_user_file(background):
+    file_name = filedialog.askopenfilename(parent=background)
+    get_hub_token()
+
+def get_hub_token():
+    config = configparser.ConfigParser()
+    config['app_info']
+    #url ='ttps://api.github.com/applications/YOUR_CLIENT_ID/token'
 
 
+
+    
 
 def clear(background):
     hours_menu(background)

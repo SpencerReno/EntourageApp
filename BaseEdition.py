@@ -594,9 +594,11 @@ def send_hours(tree, course):
         hour_sheet =df 
         download_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
         hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
+        url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+        info = requests.get(url).json()
 
         from_addr = 'eibehours@outlook.com'
-        to_addr = 'sreno@entouragebeauty.com'
+        to_addr = info['info']['HOURS_EMAIL']
         subject = 'Hours'
 
         msg = MIMEMultipart()
@@ -627,7 +629,6 @@ def send_hours(tree, course):
         server.ehlo()
         server.login(from_addr, 'coldL!ght65#')
         server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
-        print('here',  server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr]))
         server.quit()
         success_window()
     
