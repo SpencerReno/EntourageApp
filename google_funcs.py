@@ -64,8 +64,8 @@ def get_student_status(course):
 
 
 def get_unpaid_students():
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
-    data = pd.read_csv('./CSV Files/Ledger.csv')  
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/ledger.csv'
+    data = pd.read_csv(url)  
     student_column = data.columns[8]
     student_ids_column =data.columns[5]
     data.rename(columns={data.columns[4]: 'Dates'}, inplace=True)
