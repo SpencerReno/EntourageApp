@@ -31,7 +31,7 @@ def adding(text):
 
 
 def get_student_status(course):
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
     data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev Grad']]
 
@@ -134,7 +134,7 @@ def get_unpaid_students():
     return Final_df
 
 def course_100_file(course):
-    url  = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    url  = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
     if course == 'Cos':
         data = data[(data['Groups']=='Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
@@ -155,7 +155,7 @@ def course_100_file(course):
 
 
 def esti_online_hours():  
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
     data = data[['Acct', 'Name', 'Last name', 'Groups', 'Tot hrs', 'Tran hrs']]
     esti_data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
@@ -262,7 +262,7 @@ def esti_online_hours():
 
 
 def cos_online_hours():
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
     data = data[['Acct', 'Name', 'Last name', 'Groups']]
     cos_data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
@@ -292,7 +292,7 @@ def cos_online_hours():
     return cos_full, cos_part
 
 def massage_online_hours():
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
     data = data[['Acct', 'Name', 'Last name', 'Groups']]
     massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
@@ -307,7 +307,7 @@ def massage_online_hours():
 
 
 def nails_online_hours():
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/Entourage%20Remaining%20Hours.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
     data = data[['Acct', 'Name', 'Last name', 'Groups']]
     nails_data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
