@@ -79,7 +79,7 @@ def update_check(update_label, main_background):
     local_app_version =local_info['info']['APP_VERSION']
     if server_app_version != local_app_version:
         update_label.config(text='UPDATE REQUIRED!!')
-        update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_app())
+        update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_page())
         update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
         os.system('python updater.py')
         sys.exit()
