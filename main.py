@@ -1204,16 +1204,25 @@ def update_app_page(background):
 
 def get_user_file(background):
     file_name = filedialog.askopenfilename(parent=background)
-    get_hub_token()
+    file = open(file_name)
+    file = file.read()
+    print(file)
+    #get_hub_token()
 
-def get_hub_token():
-    config = configparser.ConfigParser()
-    config['app_info']
-    #url ='ttps://api.github.com/applications/YOUR_CLIENT_ID/token'
+def get_hub_token(file_name):
+    headers = {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer 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',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
 
+    data = {
+        "message":"App Update",
+        "committer":{"name":"Spencer Reno","email":"sreno69@gmail.com"},
+        "content":f"{file_name.content}"}
 
-
-    
+    response = requests.put('https://api.github.com/repos/OWNER/REPO/contents/PATH', headers=headers, data=data)
 
 def clear(background):
     hours_menu(background)
