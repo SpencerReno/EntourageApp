@@ -1,5 +1,4 @@
 import tkinter as tk 
-from google_funcs import *
 from tkinter.filedialog import asksaveasfile
 from tkinter import ttk, filedialog, messagebox
 import requests
@@ -21,6 +20,7 @@ from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from google_funcs import * 
 
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
 
@@ -41,7 +41,7 @@ main_color = '#313942'
 
 root = tk.Tk()
 root.config(bg=main_color)
-root.title("Entourage Hours Sheets")
+root.title("Entourage App")
 root.iconbitmap(resource_path('assets\\EIB_black_pink.ico'))
 blank_background = tk.Label(root, bg=main_color)
 blank_background.place(relheight=1, relwidth=1)
@@ -92,7 +92,7 @@ def update_app():
     download = urlretrieve(url, destination)
 
     print('File downloaded')
-    #delete_old()
+    delete_old()
     install_new()
 
 def delete_old():

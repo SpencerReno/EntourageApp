@@ -22,6 +22,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import configparser
+import json
+import base64
+from github import Github
+
 
 
 ##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
@@ -43,7 +47,7 @@ main_color = '#313942'
 
 root = tk.Tk()
 root.config(bg=main_color)
-root.title("Entourage Hours Sheets")
+root.title("Entourage App")
 root.iconbitmap(resource_path('assets\\EIB_black_pink.ico'))
 
 
@@ -119,7 +123,7 @@ def show_menu():
     status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
     status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
 
-    update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: update_app_page(main_background))
+    update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: get_user_file(main_background))
     update_button.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
 
 
@@ -1187,42 +1191,48 @@ def fail_window():
     messagebox.showerror("showerror", "Error Check Date Format is\n MM/DD/YY or \n MM/DD/YY - MM/DD/YY for two days") 
 
 
-def update_app_page(background):
-    background.destroy()
-    update_background =tk.Label(blank_background, bg=main_color)
-    update_background.place(relheight=1, relwidth=1)
-
-    back_button = tk.Button(update_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(update_background))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
-
-    title_label = tk.Label(update_background, text = 'Application Update', bg=main_color, fg='black', font=('Times', '36','bold'))
-    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
-
-    upload_button = tk.Button(update_background, text= 'Upload Files', bg='black', fg='white',activebackground='black', command= lambda: get_user_file(update_background))
-    upload_button.place(relheight=.1,relwidth=.1, relx=.45,rely=.5)
-
 
 def get_user_file(background):
-    file_name = filedialog.askopenfilename(parent=background)
-    file = open(file_name)
-    file = file.read()
-    print(file)
-    #get_hub_token()
+    file = filedialog.askopenfilename(parent=background)
+    file_name = file.split('/')[-1]
+    if file_name == 'EntourageApp.csv':
 
-def get_hub_token(file_name):
-    headers = {
-        'Accept': 'application/vnd.github+json',
-        'Authorization': 'Bearer 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',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    }
+        with open(file, 'r') as file:
+            data = file.read()
+        update_app_file(data)
+    elif file_name == 'ledger.csv':
+        with open(file, 'r') as file:
+            data = file.read()
+        update_ledger_file(data)
+    else:
+        messagebox.showerror("showerror", "Check the spelling of file name it is case sensitive\n The only files you can update are\n ledger.csv \n EntourageApp.csv")
 
-    data = {
-        "message":"App Update",
-        "committer":{"name":"Spencer Reno","email":"sreno69@gmail.com"},
-        "content":f"{file_name.content}"}
 
-    response = requests.put('https://api.github.com/repos/OWNER/REPO/contents/PATH', headers=headers, data=data)
+def update_ledger_file(file):
+    g = Github('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')
+    repo = g.get_repo('SpencerReno/EntourageApp')
+    try:
+        contents = repo.get_contents("CSV Files/ledger.csv")
+        repo.update_file(contents.path, 'App updated', file, sha=contents.sha, branch='main')
+        messagebox.showinfo('Success!', 'Ledger file has now been sucessfully updated!')
+
+    except:
+        repo.create_file('CSV Files/ledger.csv', 'App updated', file,  branch='main')
+        messagebox.showinfo('Success!', 'Ledger file has now been sucessfully updated!')
+ 
+
+
+def update_app_file(file):
+    g = Github('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')
+    repo = g.get_repo('SpencerReno/EntourageApp')
+    try:
+        contents = repo.get_contents("CSV Files/EntourageApp.csv")
+        repo.update_file(contents.path, 'App updated', file, sha=contents.sha, branch='main')
+        messagebox.showinfo('Success!', 'Entourage App file has now been sucessfully updated!')
+    except:
+        repo.create_file('CSV Files/EntourageApp.csv', 'App updated', file,  branch='main')
+        messagebox.showinfo('Success!', 'Entourage App file has now been sucessfully updated!')
+ 
 
 def clear(background):
     hours_menu(background)
