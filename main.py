@@ -919,7 +919,7 @@ def send_hours(tree, course):
 
         time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
 
-        with open(time_clock_report, 'r+') as f:
+        with open(time_clock_report, 'rb') as f:
             attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
             attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
 
@@ -929,6 +929,8 @@ def send_hours(tree, course):
         with open(hours_sheet_report, 'r') as f:
             attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
             attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+
+
         msg.attach(attachment)
         msg.attach(attachment2)
         server = smtplib.SMTP('smtp.office365.com', 587)

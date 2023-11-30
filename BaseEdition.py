@@ -590,7 +590,6 @@ def send_hours(tree, course):
     df = pd.DataFrame(row_list, columns=cols)
     try:
         download_clock= get_download_clock_file(df)
-        print(download_clock)
         hour_sheet =df 
         download_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
         hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
@@ -611,7 +610,7 @@ def send_hours(tree, course):
 
         time_clock_report = 'C:\\Windows\\Temp\\TimeClockReport.data'
 
-        with open(time_clock_report, 'r+') as f:
+        with open(time_clock_report, 'rb') as f:
             attachment = MIMEApplication(f.read(), name=basename(time_clock_report))
             attachment['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(time_clock_report))
 
