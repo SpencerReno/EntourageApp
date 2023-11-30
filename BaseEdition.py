@@ -54,64 +54,64 @@ global settings_photo
 settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 
 
-def update_check():
-    print('checking for updates')
-    root.geometry('300x300')
-    main_background =tk.Label(blank_background, bg=main_color)
-    main_background.place(relheight=1, relwidth=1)
-    update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
-    update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
+# def update_check():
+#     print('checking for updates')
+#     root.geometry('300x300')
+#     main_background =tk.Label(blank_background, bg=main_color)
+#     main_background.place(relheight=1, relwidth=1)
+#     update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
+#     update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
 
-    url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
-    info = requests.get(url).json()
-    server_app_version = info['info']['APP_VERSION']
-
-
-    local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
-    local_info = json.load(local_info)
-    local_app_version =local_info['info']['APP_VERSION']
-
-    if server_app_version != local_app_version:
-        update_label.config(text='UPDATE REQUIRED!!')
-        update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_app())
-        update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
+#     url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+#     info = requests.get(url).json()
+#     server_app_version = info['info']['APP_VERSION']
 
 
-    else:
-        update_label.after(2000, show_menu)
-    root.mainloop()
+#     local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
+#     local_info = json.load(local_info)
+#     local_app_version =local_info['info']['APP_VERSION']
 
-def update_app():
-    url = 'https://github.com/SpencerReno/EntourageApp/raw/main/EntourageDirectors.exe'
+#     if server_app_version != local_app_version:
+#         update_label.config(text='UPDATE REQUIRED!!')
+#         update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_app())
+#         update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
 
-    print('File Downloading')
 
-    usrname = getpass.getuser()
-    destination = f'C:\\Users\\{usrname}\\Downloads\\EntourageApp.exe'
+#     else:
+#         update_label.after(2000, show_menu)
+#     root.mainloop()
 
-    download = urlretrieve(url, destination)
+# def update_app():
+#     url = 'https://github.com/SpencerReno/EntourageApp/raw/main/EntourageDirectors.exe'
 
-    print('File downloaded')
-    delete_old()
-    install_new()
+#     print('File Downloading')
 
-def delete_old():
-    try:
-        cmd = f'C:\\Program Files (x86)\\EntourageDirectors\\unins000.exe'
+#     usrname = getpass.getuser()
+#     destination = f'C:\\Users\\{usrname}\\Downloads\\EntourageApp.exe'
 
-        returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-        print('returned value:', returned_value)
+#     download = urlretrieve(url, destination)
 
-        install_new()
-    except:
-        install_new()
-def install_new():
-    usrname = getpass.getuser()
+#     print('File downloaded')
+#     delete_old()
+#     install_new()
 
-    cmd = f'C:\\Users\\{usrname}\\Downloads  EntourageApp.exe'
+# def delete_old():
+#     try:
+#         cmd = f'C:\\Program Files (x86)\\EntourageDirectors\\unins000.exe'
 
-    returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-    print('returned value:', returned_value)
+#         returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+#         print('returned value:', returned_value)
+
+#         install_new()
+#     except:
+#         install_new()
+# def install_new():
+#     usrname = getpass.getuser()
+
+#     cmd = f'C:\\Users\\{usrname}\\Downloads  EntourageApp.exe'
+
+#     returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+#     print('returned value:', returned_value)
 
 
 
@@ -133,7 +133,7 @@ def show_menu():
 
     hours_creator = tk.Button(main_background, text='Hours Creator', bg='black', fg='white', command=lambda: hours_menu(main_background))
     hours_creator.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
-
+    root.mainloop()
 
 
 
@@ -857,4 +857,4 @@ def clear_main(background):
     background.destroy()
     show_menu()
 
-update_check()
+show_menu()
