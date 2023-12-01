@@ -706,10 +706,11 @@ def status_show(course):
 def status_massage(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
-    data = data[data['Groups'] == 'Massage Therapy']
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[data['Groups'] == 'Massage Therapy']
     data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
@@ -732,12 +733,15 @@ def status_massage(background):
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
-    data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
+
     data['Groups'] = data['Groups'].str.replace('Cosmetology Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Cosmetology Part Time', 'PT')
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -766,12 +770,14 @@ def status_cos(background):
 def status_esti(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
-    data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Groups'] = data['Groups'].str.replace('Esthetics Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Esthetics Part Time', 'PT')
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -782,13 +788,41 @@ def status_esti(background):
     title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    esti_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
-    esti_am_view = tk.Button(settings_background, text='Day Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_am, settings_background, tv1))
-    esti_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
     esti_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
-    esti_pm_view = tk.Button(settings_background, text='Night Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_pm, settings_background, tv1))
-    esti_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
+    esti_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
+
+
+
+
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+
+
+
+    fresh_am = esti_am[esti_am['Tot hrs'] < 290]
+    esti_hours_FRam = tk.Button(settings_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: get_small_treeview(fresh_am, settings_background, tv1))
+    esti_hours_FRam.place(relheight=.1,relwidth=.2, relx=.01,rely=.77)
+
+    fresh_pm = esti_pm[esti_pm['Tot hrs'] < 290]
+    esti_hours_FRpm = tk.Button(settings_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(fresh_pm, settings_background, tv1))
+    esti_hours_FRpm.place(relheight=.1,relwidth=.2, relx=.01,rely=.88)
+
+    jr_am = esti_am[(esti_am['Tot hrs'] > 290) & (esti_am['Tot hrs'] < 690)]
+    esti_hours_JRam = tk.Button(settings_background, text='Junior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(jr_am, settings_background, tv1))
+    esti_hours_JRam.place(relheight=.1,relwidth=.2, relx=.23,rely=.77)
+
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+    esti_hours_JRpm = tk.Button(settings_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(jr_pm, settings_background, tv1))
+    esti_hours_JRpm.place(relheight=.1,relwidth=.2, relx=.23,rely=.88)
+
+    sr_am = esti_am[esti_am['Tot hrs'] >= 690 ]
+    esti_hours_SRam = tk.Button(settings_background, text='Senior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(sr_am, settings_background, tv1))
+    esti_hours_SRam.place(relheight=.1,relwidth=.2, relx=.45,rely=.77)
+
+
+    sr_pm = esti_pm[esti_pm['Tot hrs'] >= 690 ]
+    esti_hours_SRpm = tk.Button(settings_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(sr_pm, settings_background, tv1))
+    esti_hours_SRpm.place(relheight=.1,relwidth=.2, relx=.45,rely=.88)
 
 
 
@@ -799,12 +833,14 @@ def status_esti(background):
 def status_nails(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data.drop(columns=['Last name', 'Balance', 'LDA hrs','Tran hrs'], inplace=True)
-    data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
+    data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Groups'] = data['Groups'].str.replace('Nails Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Nails Part Time', 'PT')
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
