@@ -63,35 +63,35 @@ global settings_photo
 settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 
 
-def update_page():
-    print('checking for updates')
-    root.geometry('300x300')
-    main_background =tk.Label(blank_background, bg=main_color)
-    main_background.place(relheight=1, relwidth=1)
-    update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
-    update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
-    update_label.after(1000, update_check(update_label, main_background))
+# def update_page():
+#     print('checking for updates')
+#     root.geometry('300x300')
+#     main_background =tk.Label(blank_background, bg=main_color)
+#     main_background.place(relheight=1, relwidth=1)
+#     update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
+#     update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
+#     update_label.after(1000, update_check(update_label, main_background))
 
-def update_check(update_label, main_background):
-    url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
-    info = requests.get(url).json()
-    server_app_version = info['info']['APP_VERSION']
-
-
-    local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
-    local_info = json.load(local_info)
-    local_app_version =local_info['info']['APP_VERSION']
-    if server_app_version != local_app_version:
-        update_label.config(text='UPDATE REQUIRED!!')
-        update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_page())
-        update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
-        os.system('python updater.py')
-        sys.exit()
+# def update_check(update_label, main_background):
+#     url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+#     info = requests.get(url).json()
+#     server_app_version = info['info']['APP_VERSION']
 
 
-    else:
-        update_label.after(2000, show_menu)
-    root.mainloop()
+#     local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
+#     local_info = json.load(local_info)
+#     local_app_version =local_info['info']['APP_VERSION']
+#     if server_app_version != local_app_version:
+#         update_label.config(text='UPDATE REQUIRED!!')
+#         update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_page())
+#         update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
+#         os.system('python updater.py')
+#         sys.exit()
+
+
+#     else:
+#         update_label.after(2000, show_menu)
+#     root.mainloop()
 
 
 
@@ -126,7 +126,7 @@ def show_menu():
     update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: get_user_file(main_background))
     update_button.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
 
-
+    root.mainloop()
 
 
 
@@ -1211,7 +1211,7 @@ def get_user_file(background):
 
 
 def update_ledger_file(file):
-    g = Github('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')
+    g = Github('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')
     repo = g.get_repo('SpencerReno/EntourageApp')
     try:
         contents = repo.get_contents("CSV Files/ledger.csv")
@@ -1225,7 +1225,7 @@ def update_ledger_file(file):
 
 
 def update_app_file(file):
-    g = Github('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')
+    g = Github('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')
     repo = g.get_repo('SpencerReno/EntourageApp')
     try:
         contents = repo.get_contents("CSV Files/EntourageApp.csv")
@@ -1250,4 +1250,4 @@ def clear_main(background):
     background.destroy()
     show_menu()
 
-update_page()
+show_menu()
