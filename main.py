@@ -896,9 +896,9 @@ def send_hours(tree, course):
     for row in tree.get_children():
         row_list.append(tree.item(row)['values'])
     df = pd.DataFrame(row_list, columns=cols)
-    try:
-        download_clock= get_download_clock_file(df)
-        print(download_clock)
+    download_clock , send_clause= get_download_clock_file(df)
+    print(download_clock, send_clause)
+    if send_clause == True:
         hour_sheet =df 
         download_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
         hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
@@ -941,8 +941,8 @@ def send_hours(tree, course):
         server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
         server.quit()
         success_window()
-    
-    except: 
+
+    else: 
         fail_window()
 
 
@@ -1187,31 +1187,35 @@ def get_treeview(data, background):
     return tv1 
 
 def success_window():
-    messagebox.showinfo("showinfo", "Hours Have Been Submitted!") 
+    messagebox.showinfo("Sucess", "Hours Have Been Submitted!") 
 
 def fail_window():
-    messagebox.showerror("showerror", "Error Check Date Format is\n MM/DD/YY or \n MM/DD/YY - MM/DD/YY for two days") 
+    messagebox.showerror("Correct Dates Format", "Error Check Date Format is\nMM/DD/YY \nor\nMM/DD/YY - MM/DD/YY for two days") 
 
 
 
 def get_user_file(background):
+    url = 'https://drive.google.com/file/d/1mAylyV8f-wJFWTl_K8qoak5g1E8PNOA6/view?usp=sharing'
+    path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
+    res = requests.get(path)
+    git_hub_code = res.text
     file = filedialog.askopenfilename(parent=background)
     file_name = file.split('/')[-1]
     if file_name == 'EntourageApp.csv':
 
         with open(file, 'r') as file:
             data = file.read()
-        update_app_file(data)
+        update_app_file(data, git_hub_code)
     elif file_name == 'ledger.csv':
         with open(file, 'r') as file:
             data = file.read()
-        update_ledger_file(data)
+        update_ledger_file(data, git_hub_code)
     else:
         messagebox.showerror("showerror", "Check the spelling of file name it is case sensitive\n The only files you can update are\n ledger.csv \n EntourageApp.csv")
 
 
-def update_ledger_file(file):
-    g = Github('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')
+def update_ledger_file(file, git_hub_code):
+    g = Github(git_hub_code)
     repo = g.get_repo('SpencerReno/EntourageApp')
     try:
         contents = repo.get_contents("CSV Files/ledger.csv")
@@ -1224,8 +1228,8 @@ def update_ledger_file(file):
  
 
 
-def update_app_file(file):
-    g = Github('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')
+def update_app_file(file, git_hub_code):
+    g = Github(git_hub_code)
     repo = g.get_repo('SpencerReno/EntourageApp')
     try:
         contents = repo.get_contents("CSV Files/EntourageApp.csv")
