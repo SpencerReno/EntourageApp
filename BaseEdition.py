@@ -588,8 +588,9 @@ def send_hours(tree, course):
     for row in tree.get_children():
         row_list.append(tree.item(row)['values'])
     df = pd.DataFrame(row_list, columns=cols)
-    try:
-        download_clock= get_download_clock_file(df)
+    download_clock , send_clause= get_download_clock_file(df)
+    print(download_clock, send_clause)
+    if send_clause == True:
         hour_sheet =df 
         download_clock.to_csv(f'C:\\Windows\\Temp\\TimeClockReport.data', sep=' ', header=False, index=False)
         hour_sheet.to_csv(f'C:\\Windows\\Temp\\HoursSheet.csv',index=False)
@@ -617,23 +618,25 @@ def send_hours(tree, course):
 
         hours_sheet_report = 'C:\\Windows\\Temp\\HoursSheet.csv'
 
-        # with open(hours_sheet_report, 'r') as f:
-        #     attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
-        #     attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
-        # msg.attach(attachment)
-        # msg.attach(attachment2)
-        # server = smtplib.SMTP('smtp.office365.com', 587)
-        # server.ehlo()
-        # server.starttls()
-        # server.ehlo()
-        # server.login(from_addr, 'coldL!ght65#')
-        # server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
-        # server.quit()
+        with open(hours_sheet_report, 'r') as f:
+            attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
+            attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
+
+
+        msg.attach(attachment)
+        msg.attach(attachment2)
+        server = smtplib.SMTP('smtp.office365.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(from_addr, 'coldL!ght65#')
+        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        server.quit()
         success_window()
 
-    
-    except: 
+    else: 
         fail_window()
+
 
 
 def status_page(background):
@@ -878,11 +881,10 @@ def get_small_treeview(data, background, tree):
 
 
 def success_window():
-    messagebox.showinfo("showinfo", "Hours Have Been Submitted!") 
+    messagebox.showinfo("Sucess", "Hours Have Been Submitted!") 
 
 def fail_window():
-    messagebox.showerror("showerror", "Error Check Date Format is\n MM/DD/YY or \n MM/DD/YY - MM/DD/YY for two days") 
-
+    messagebox.showerror("Correct Dates Format", "Error Check Date Format is\nMM/DD/YY \nor\nMM/DD/YY - MM/DD/YY for two days") 
 
 def clear(background):
     hours_menu(background)
