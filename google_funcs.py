@@ -345,6 +345,7 @@ def get_download_clock_file(df):
     df=df.dropna(axis=0)
     clocked_hours = pd.DataFrame(columns=[0,1,2])
     df['Date']=df['Date'].replace(' ', '')
+    print(df)
     send_clause= False
     for x in range(len(df)):
         student_id = df['Acct'].iloc[x]
@@ -360,6 +361,7 @@ def get_download_clock_file(df):
         else:
             if '-' not in string:
                 if len(string) <= 8:
+                    print(string)
                     if int(string.split('/')[0])>=1 and int(string.split('/')[0])<13:
                         if int(string.split('/')[1])>=1 and int(string.split('/')[1])<31:
                                 date_list.append(parser.parse(string))

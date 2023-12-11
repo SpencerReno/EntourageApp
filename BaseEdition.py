@@ -484,8 +484,8 @@ def inservice_day(background, tree):
         df['Name'] = first_name
         df['Last name'] = last_name
         df['hours'] = '9:00 - 4:00'
-        df['Date'] = ''
-        df['Aissigned Work'] = ''
+        df['Date'] = ' '
+        df['Aissigned Work'] = ' '
 
     if hours[0] == '4:30 - 9:30':
         df = pd.DataFrame(columns=['Acct', 'Name', 'Last name', 'hours', 'Date', 'Aissigned Work'])
@@ -493,8 +493,8 @@ def inservice_day(background, tree):
         df['Name'] = first_name
         df['Last name'] = last_name
         df['hours'] = '5:30 - 9:30'
-        df['Date'] = ''
-        df['Aissigned Work'] = ''
+        df['Date'] = ' '
+        df['Aissigned Work'] = ' '
 
     new_hours_treeview(df, background, tree)
 
