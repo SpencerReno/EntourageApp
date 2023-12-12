@@ -341,85 +341,91 @@ def nails_online_hours():
 
 
 def get_download_clock_file(df):
-    df['Date']=df['Date'].replace(' ', np.nan)
+    df['Date'] = df['Date'].apply(lambda x: x.strip())
+    df['Date']=df['Date'].replace('', np.nan)
     df=df.dropna(axis=0)
     clocked_hours = pd.DataFrame(columns=[0,1,2])
     df['Date']=df['Date'].replace(' ', '')
     print(df)
     send_clause= False
-    for x in range(len(df)):
-        student_id = df['Acct'].iloc[x]
-        date_list = []
-        string = df['Date'].iloc[x].replace(' ', '')
-        if len(string)> 9:
-            if '-' in string:
-                if len(string.split('-')) <=2:
-                    for y in range(len(string.split('-'))):
-                        date = parser.parse(string.split('-')[y])
-                        date_list.append(date)
-                    send_clause = True
-        else:
-            if '-' not in string:
-                if len(string) <= 8:
-                    print(string)
-                    if int(string.split('/')[0])>=1 and int(string.split('/')[0])<13:
-                        if int(string.split('/')[1])>=1 and int(string.split('/')[1])<31:
-                                date_list.append(parser.parse(string))
-                                send_clause = True
-
-        print(date_list)
-        for date in date_list:
-            month = date.month
-            if len(str(month)) == 1:
-                month = f'0{str(month)}'
-
-            day = date.day
-            if len(str(day)) == 1:
-                day = f'0{str(day)}'
-
-
-            year_test = int(str(date.year)[-2:])
-
-
-            #Check if the year entered is == to last year   
-            if year_test == int(str(datetime.date.today().year)[-2:]) - 1:
-                year= year_test
-            #Check if the year entered is == to next year   
-            elif year_test == int(str(datetime.date.today().year)[-2:]) +1:
-                year = year_test
-            #Check if the year entered is == to current year    
-            elif year_test == int(str(datetime.date.today().year)[-2:]):
-                year = year_test
-
+    try:
+        for x in range(len(df)):
+            student_id = df['Acct'].iloc[x]
+            date_list = []
+            string = df['Date'].iloc[x].replace(' ', '')
+            if len(string)> 9:
+                if '-' in string:
+                    if len(string.split('-')) <=2:
+                        for y in range(len(string.split('-'))):
+                            date = parser.parse(string.split('-')[y])
+                            date_list.append(date)
+                        send_clause = True
             else:
-                year = int(str(datetime.date.today().year)[-2:])
+                if '-' not in string:
+                    if len(string) <= 8:
+                        print(string)
+                        if int(string.split('/')[0])>=1 and int(string.split('/')[0])<13:
+                            if int(string.split('/')[1])>=1 and int(string.split('/')[1])<31:
+                                    date_list.append(parser.parse(string))
+                                    send_clause = True
 
-            print(month, day, year)
+            print(date_list)
+            for date in date_list:
+                month = date.month
+                if len(str(month)) == 1:
+                    month = f'0{str(month)}'
 
-            if '30 ' in df['hours'].iloc[x].split('-')[0]:
-                intime = int(df['hours'].iloc[x].split('-')[0][0]) +12
-            elif '00 ' in df['hours'].iloc[x].split('-')[0]:
-                intime = f"0{int(df['hours'].iloc[x].split('-')[0][0])}"
-
-            out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
+                day = date.day
+                if len(str(day)) == 1:
+                    day = f'0{str(day)}'
 
 
-            clock_in = {
-                0 : 'PN00',
-                1 : f'{year}{month}{day}{str(intime)}0000'.replace(' ', ''),
-                2: f'10000M00000{student_id}'.replace(' ', '')
-                }
+                year_test = int(str(date.year)[-2:])
 
-            clock_out = {
+
+                #Check if the year entered is == to last year   
+                if year_test == int(str(datetime.date.today().year)[-2:]) - 1:
+                    year= year_test
+                #Check if the year entered is == to next year   
+                elif year_test == int(str(datetime.date.today().year)[-2:]) +1:
+                    year = year_test
+                #Check if the year entered is == to current year    
+                elif year_test == int(str(datetime.date.today().year)[-2:]):
+                    year = year_test
+
+                else:
+                    year = int(str(datetime.date.today().year)[-2:])
+
+                print(month, day, year)
+
+                if '30 ' in df['hours'].iloc[x].split('-')[0]:
+                    intime = int(df['hours'].iloc[x].split('-')[0][0]) +12
+                elif '00 ' in df['hours'].iloc[x].split('-')[0]:
+                    intime = f"0{int(df['hours'].iloc[x].split('-')[0][0])}"
+
+                out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
+
+
+                clock_in = {
                     0 : 'PN00',
-                    1 : f'{year}{month}{day}{str(out_time)}0000'.replace(' ', ''),
-                    2: f'50000M00000{student_id}'.replace(' ', '')
-                }   
-            clocked_hours = clocked_hours.append(clock_in, ignore_index=True)
-            clocked_hours=clocked_hours.append(clock_out, ignore_index=True)
+                    1 : f'{year}{month}{day}{str(intime)}0000'.replace(' ', ''),
+                    2: f'10000M00000{student_id}'.replace(' ', '')
+                    }
 
-    return clocked_hours, send_clause
-    
+                clock_out = {
+                        0 : 'PN00',
+                        1 : f'{year}{month}{day}{str(out_time)}0000'.replace(' ', ''),
+                        2: f'50000M00000{student_id}'.replace(' ', '')
+                    }   
+                clocked_hours = clocked_hours.append(clock_in, ignore_index=True)
+                clocked_hours=clocked_hours.append(clock_out, ignore_index=True)
+
+        return clocked_hours, send_clause
+    except ValueError:
+        send_clause= False
+        return clocked_hours, send_clause
+
+        
     
 
 

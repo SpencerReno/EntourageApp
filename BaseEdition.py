@@ -588,7 +588,8 @@ def send_hours(tree, course):
     for row in tree.get_children():
         row_list.append(tree.item(row)['values'])
     df = pd.DataFrame(row_list, columns=cols)
-    download_clock , send_clause= get_download_clock_file(df)
+    clock_df = df[['Acct', 'hours', 'Date']]
+    download_clock , send_clause= get_download_clock_file(clock_df)
     print(download_clock, send_clause)
     if send_clause == True:
         hour_sheet =df 
