@@ -337,7 +337,7 @@ def nails_online_hours():
 
 
     return nails_full, nails_part 
-    
+
 
 
 def get_download_clock_file(df):
