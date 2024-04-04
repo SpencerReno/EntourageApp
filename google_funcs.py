@@ -217,13 +217,15 @@ def esti_online_hours():
 
     def add_cols_am(data):
         if data['Tot hrs'].iloc[0] < 290:
-            data['hours'] =  '9:00 - 3:00'
+            data['clock in'] =  '9:00 am'
+            data['clock out'] =  '3:00 pm'
         if data['Tot hrs'].iloc[0] > 290 and data['Tot hrs'].iloc[0] < 690:
-            data['hours'] = '9:00 - 3:00'
+            data['clock in'] =  '9:00 am'
+            data['clock out'] = '3:00 pm'
 
         if data['Tot hrs'].iloc[0] >=690:
-            data['hours'] = '9:00 - 4:00'
-
+            data['clock in'] =  '9:00 am'
+            data['clock out'] = '4:00 pm'    
         
         data['Date'] = ' '
         data['Aissigned Work'] = ' '
@@ -235,12 +237,15 @@ def esti_online_hours():
 
     def add_cols_pm(data):
         if data['Tot hrs'].iloc[0] < 290:
-            data['hours'] =  '4:30 - 9:30'
+            data['clock in'] =  '4:30 pm'
+            data['clock out'] =  '9:30 pm'
         if data['Tot hrs'].iloc[0] > 290 and data['Tot hrs'].iloc[0] < 690:
-            data['hours'] = '4:30 - 9:30'
+            data['clock in'] =  '4:30 pm'
+            data['clock out'] =  '9:30 pm'
         
         if data['Tot hrs'].iloc[0] >= 690:
-            data['hours'] = '4:30 - 9:30'
+            data['clock in'] =  '5:30 pm'
+            data['clock out'] =  '9:30 pm'
             
 
         
@@ -278,7 +283,8 @@ def cos_online_hours():
 
     cos_full = cos_data[cos_data['Groups'] == 'Cosmetology Full Time']
     cos_full.drop(columns=['Groups'], inplace=True)
-    cos_full['hours'] = "9:00 - 4:00"
+    cos_full['clock in'] =  '9:00 am'
+    cos_full['clock out'] = '4:00 pm'
     cos_full['Date'] = ' '
     cos_full['Homework Given'] = ' '
 
@@ -286,7 +292,8 @@ def cos_online_hours():
     
     cos_part = cos_data[cos_data['Groups'] != 'Cosmetology Full Time']
     cos_part.drop(columns=['Groups'], inplace=True)
-    cos_part['hours'] = "5:30 - 9:30"
+    cos_part['clock in'] =  '5:30 pm'
+    cos_part['clock out'] = '9:30 pm'
     cos_part['Date'] = ' '
     cos_part['Homework Given'] =  ' '
 
@@ -299,7 +306,9 @@ def massage_online_hours():
     data = data[['Acct', 'Name', 'Last name', 'Groups']]
     massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
 
-    massage_data['hours'] = "9:00 - 4:00"
+
+    massage_data['clock in'] =  '9:00 am'
+    massage_data['clock out'] = '4:00 pm'   
     massage_data['Date'] = ' '
     massage_data['Homework Given'] =  ' '
 
@@ -323,7 +332,9 @@ def nails_online_hours():
 
     nails_full = nails_data[nails_data['Groups'] == 'Nails Full Time']
     nails_full.drop(columns=['Groups'], inplace=True)
-    nails_full['hours'] = "9:00 - 4:00"
+
+    nails_full['clock in'] =  '9:00 am'
+    nails_full['clock out'] = '4:00 pm'
     nails_full['Date'] = ' '
     nails_full['Homework Given'] = ' '
 
@@ -331,7 +342,8 @@ def nails_online_hours():
     
     nails_part= nails_data[nails_data['Groups'] != 'Nails Full Time']
     nails_part.drop(columns=['Groups'], inplace=True)
-    nails_part['hours'] = "5:30 - 9:30"
+    nails_part['clock in'] =  '5:30 pm'
+    nails_part['clock out'] = '9:30 pm'   
     nails_part['Date'] = ' '
     nails_part['Homework Given'] =  ' '
 
@@ -342,7 +354,7 @@ def nails_online_hours():
 
 def get_download_clock_file(df):
     df['Date'] = df['Date'].apply(lambda x: x.strip())
-    df['Date']=df['Date'].replace('', np.nan)
+    df['Date']= df['Date'].replace('', np.nan)
     df=df.dropna(axis=0)
     clocked_hours = pd.DataFrame(columns=[0,1,2])
     df['Date']=df['Date'].replace(' ', '')
@@ -369,7 +381,6 @@ def get_download_clock_file(df):
                                     date_list.append(parser.parse(string))
                                     send_clause = True
 
-            print(date_list)
             for date in date_list:
                 month = date.month
                 if len(str(month)) == 1:
@@ -396,25 +407,42 @@ def get_download_clock_file(df):
                 else:
                     year = int(str(datetime.date.today().year)[-2:])
 
-                print(month, day, year)
 
-                if '30 ' in df['hours'].iloc[x].split('-')[0]:
-                    intime = int(df['hours'].iloc[x].split('-')[0][0]) +12
-                elif '00 ' in df['hours'].iloc[x].split('-')[0]:
-                    intime = f"0{int(df['hours'].iloc[x].split('-')[0][0])}"
 
-                out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
+                intime = df['clock in'].iloc[x][:4].strip(' ')
+                in_condition = df['clock in'].iloc[x][4:].strip(' ')
+                outtime = df['clock out'].iloc[x][:4].strip(' ')
+                out_condition = df['clock out'].iloc[x][4:].strip(' ')
+                if in_condition != 'am' or in_condition != 'pm':
+                    raise SyntaxError
+            
+                if out_condition != 'am' or out_condition != 'pm':
+                    raise SyntaxError
+
+                in_time_hour = intime.split(':')[0]
+                if len(in_time_hour) < 2 and 'am' in in_condition:
+                    in_time_hour =f'0{in_time_hour}'
+
+                out_time_hour = outtime.split(':')[0]    
+                if len(out_time_hour) < 2 and 'am' in out_condition:
+                    out_time_hour =f'0{out_time_hour}'
+
+                if 'pm' in out_condition:
+                    out_time_hour = str(int(out_time_hour )+ 12)
+                
+                if 'pm' in in_condition:
+                    in_time_hour = str(int(in_time_hour )+ 12)
 
 
                 clock_in = {
                     0 : 'PN00',
-                    1 : f'{year}{month}{day}{str(intime)}0000'.replace(' ', ''),
+                    1 : f'{year}{month}{day}{in_time_hour}{str(intime.split(":")[1])}00'.replace(' ', ''),
                     2: f'10000M00000{student_id}'.replace(' ', '')
                     }
 
                 clock_out = {
                         0 : 'PN00',
-                        1 : f'{year}{month}{day}{str(out_time)}0000'.replace(' ', ''),
+                        1 : f'{year}{month}{day}{out_time_hour}{str(outtime.split(":")[1])}00'.replace(' ', ''),
                         2: f'50000M00000{student_id}'.replace(' ', '')
                     }   
                 clocked_hours = clocked_hours.append(clock_in, ignore_index=True)
@@ -422,83 +450,12 @@ def get_download_clock_file(df):
 
         return clocked_hours, send_clause
     except ValueError:
-        send_clause= False
+        send_clause= ValueError
         return clocked_hours, send_clause
-
-        
+    except SyntaxError:
+        send_clause = SyntaxError
+        return clocked_hours, send_clause
     
-
-
-
-
-
-
-    # for x in range(0, len(df)):
-    #     if len(df['Date'].iloc[x]) > 11:
-    #         df['Date'] = df['Date'].iloc[x].replace(" ", '')
-    #         if '&' in df['Date'].iloc[x]:
-    #             dates = df['Date'].iloc[x].split('&')
-    #         else:
-    #             dates = df['Date'].iloc[x].split('-')
-
-    #         student_id = df['Acct'].iloc[x]
-    #         for date in dates:
-    #             month = date.split('/')[0]
-    #             day = date.split('/')[1]
-    #             year = date.split('/')[2][-2:]
-    #             if '30 ' in df['hours'].iloc[x].split('-')[0]:
-    #                 intime = int(df['hours'].iloc[x].split('-')[0][0]) +12
-    #             elif '00 ' in df['hours'].iloc[x].split('-')[0]:
-    #                 intime = f"0{int(df['hours'].iloc[x].split('-')[0][0])}"
-    #             out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
-    #             clocked_in = {
-    #             0 : 'PN00',
-    #             1 : f'{year}{month}{day}{str(intime)}0000'.replace(' ', ''),
-    #             2: f'10000M00000{student_id}'.replace(' ', '')
-    #             }
-
-    #             Clock_out = {
-    #                 0 : 'PN00',
-    #                 1 : f'{year}{month}{day}{str(out_time)}0000'.replace(' ', ''),
-    #                 2: f'50000M00000{student_id}'.replace(' ', '')
-    #             }   
-                
-    #             clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
-    #             clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
-                
-    #     else:
-            
-    #         student_id = df['Acct'].iloc[x]
-    #         month = df['Date'].iloc[x].split('/')[0]
-    #         day = df['Date'].iloc[x].split('/')[1]
-    #         year = df['Date'].iloc[x].split('/')[2][-2:]
-    #         if df['hours'].iloc[x].split('-')[0] == '5:30 ':
-    #                 intime = int(df['hours'].iloc[x].split('-')[0][0]) +12
-    #         elif df['hours'].iloc[x].split('-')[0] == '9:00 ':
-    #             intime = f"0{int(df['hours'].iloc[x].split('-')[0][0])}"
-    #         out_time = int(df['hours'].iloc[x].split('-')[1][1]) + 12
-        
-    #         clocked_in = {
-    #             0 : 'PN00',
-    #             1 : f'{year}{month}{day}{str(intime)}0000'.replace(' ', ''),
-    #             2: f'10000M00000{student_id}'.replace(' ', '')
-    #         }
-
-    #         Clock_out = {
-    #             0 : 'PN00',
-    #             1 : f'{year}{month}{day}{str(out_time)}0000'.replace(' ', ''),
-    #             2: f'50000M00000{student_id}'.replace(' ', '')
-    #         }
-
-    #         clocked_hours = clocked_hours.append(clocked_in, ignore_index=True)
-    #         clocked_hours=clocked_hours.append(Clock_out, ignore_index=True)
-
-
-    # return clocked_hours
-
-
-
-
 
 
 def held_back_students():
@@ -512,5 +469,104 @@ def held_back_students():
     
 
 
+def student_status_selected_cos(student_id):
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20Cos.csv'
+    data = pd.read_csv(url)
+
+    data = data[data['Acct'] == student_id]
+    column_renames = {
+        'L01' : 'Hair Coloring',
+        'L02': 'Hair Lightening',
+        'L03': 'Chemical Waving',
+        'L04':'Chemical Relaxing',
+        'L05': 'Razor Cutting',
+        'L06':  'Shear Cutting',
+        'L07' : 'Pincurl Set',
+        'L08': 'Pincurl & Wave',
+        'L09' : 'Roller Set',
+        'L010': 'Comb Out',
+        'L11': 'Curling Iron Set',
+        'L12' : 'Shampoo/Rinse/Treat',
+        'L13': 'Blow Dry Styling',
+        'L14': 'Sanitation',
+        'L15': 'Manicure',
+        'L16':'Pedicure',
+        'L17': 'Business Practice',
+        'L18' : 'Facials',
+        'L19': 'Make-up',
+        'L20': 'Client Consultation',
+        'L21':   'Waxing',
+        'L22' : 'Acrylic Nails', 
+
+        'W01' : 'Ch 1 History & Career Opp',
+        'W02' : 'Ch 2 Life Skills',
+        'W03' : 'Ch 3 Professional Image',
+        'W04' :'Ch 4 Commun. for Success',
+        'W05' :'Ch 5 Infection Control',
+        'W06' :'Ch 6 Anatomy & Physiology',
+        'W07' :'Ch 7 Skin Struct & Growth',
+        'W08' :'Ch 8 Skin Struct & Growth',
+        'W09' :'Ch 9 Nail Structure',
+        'W10':'Ch 10 Nails Disease & Dis',
+        'W11':'Ch 11 Prop of Hair & Scal',
+        'W12' :'Ch 12 Basics of Chemistry',
+        'W13' : 'Ch 13 Electricity',
+        'W14' : 'Ch 14 Hair Design',
+        'W15' : 'Ch 15 Scalp, Shampoo & Co',
+        'W16' : 'Ch 16 Haircutting',
+        'W17' : 'Ch 17 Hairstyling',
+        'W18' : 'Ch 18 Braiding',
+        'W19' : 'Ch 19 Wigs & Hair Additio',
+        'W20' : 'Ch 20 Chemical Texture',
+        'W21' : 'Ch 21 Hair Coloring',
+        'W22' : 'Ch 22 Hair Removal',
+        'W23' : 'Ch 23 Facial',
+        'W24' : 'Ch 24 Facial Makeup',
+        'W25' : 'Ch 25 Manicuing',
+        'W26' : 'Ch 26 Pedicuring',
+        'W27': 'Ch 27-29 Nail Enhancemen',
+        'W28':'Ch 30 Employment',
+        'W29':'Ch 31-32 Salon Business',
+        'W30':'Salon Project',
+        'W31':'Kansas State Law',
+        'W32':'Mid-Term Exam',
+        'W33':'Final Exam',
+        'W34':'Mock State Board Exam I',
+        'W35':'Mock State Board Exam II',
+        'W36':'Mock State Board Exam III',
+        'W37':'Resume'
+
+    }
+
+    data = data.rename(columns= column_renames)
+
+    return data
 
 
+
+def student_status_selected_esti(student_id):
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20Esti.csv'
+    data = pd.read_csv(url)
+
+    data = data[data['Acct'] == student_id]
+
+    return data
+
+
+
+def student_status_selected_nails(student_id):
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20nails.csv'
+    data = pd.read_csv(url)
+
+    data = data[data['Acct'] == student_id]
+
+    return data
+
+
+def student_status_selected_massage(student_id):
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20massage.csv'
+    data = pd.read_csv(url)
+
+    data = data[data['Acct'] == student_id]
+
+    return data

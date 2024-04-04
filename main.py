@@ -660,6 +660,7 @@ def add_student(submit_button, student_id_entry, student_first_entry,student_las
     else:
         submit_button.config(bg='Red') 
 
+
 def cos(background):
     background.destroy()
     cos_full, cos_part = cos_online_hours()
@@ -677,10 +678,8 @@ def cos(background):
     cos_pm_view = tk.Button(cos_hours_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: new_hours_treeview(cos_part, cos_hours_background, tv1))
     cos_pm_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.88)
 
-
-    download_button = tk.Button(cos_hours_background, text='Save File', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Cosmetology'))
-    download_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.77)
-
+    download_button = tk.Button(cos_hours_background, text='Export', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'cosmetology'))
+    download_button.place(relheight=.1,relwidth=.1, relx=.9,rely=0)
 
     submit_button = tk.Button(cos_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Cosmetology'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
@@ -703,9 +702,8 @@ def massage(background):
     title_label = tk.Label(massage_hours_background, text = 'Massage Online Hours', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    download_button = tk.Button(massage_hours_background, text='Save File', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Massage'))
-    download_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.77)
-
+    download_button = tk.Button(massage_hours_background, text='Export', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Massage'))
+    download_button.place(relheight=.1,relwidth=.1, relx=.9,rely=0)
 
     submit_button = tk.Button(massage_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Massage'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
@@ -741,13 +739,13 @@ def nails(background):
    
     nail_pm_view = tk.Button(nails_background, text='Night Nails', bg='black', fg='white', command= lambda: new_hours_treeview(nails_part, nails_background, tv1))
     nail_pm_view.place(relheight=.1,relwidth=.25, relx=.05,rely=.88)
-
-    download_button = tk.Button(nails_background, text='Save File', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Nails'))
-    download_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.77)
     
+    download_button = tk.Button(nails_background, text='Export', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Nails'))
+    download_button.place(relheight=.1,relwidth=.1, relx=.9,rely=0)
+
     submit_button = tk.Button(nails_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Nails'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
-
+    
 
     tv1 = get_treeview(nails_part, nails_background)
     
@@ -761,7 +759,7 @@ def nails(background):
 def esti(background):
     background.destroy()
     fresh_am, fresh_pm, jr_am, jr_pm, sr_am, sr_pm = esti_online_hours()
-
+    print(fresh_am)
 
     esti_background=tk.Label(blank_background, bg=main_color)
     esti_background.place(relheight=1, relwidth=1)
@@ -787,22 +785,25 @@ def esti(background):
     esti_hours_SRpm = tk.Button(esti_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: new_hours_treeview(sr_pm, esti_background, tv1))
     esti_hours_SRpm.place(relheight=.1,relwidth=.2, relx=.45,rely=.88)
 
-    download_button = tk.Button(esti_background, text='Save File', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Esthetics'))
-    download_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.77)
-     
+    inservice_button = tk.Button(esti_background, text='Inservice Hours', bg='Black', fg='white', activebackground='black',command= lambda: inservice_day(esti_background, tv1))
+    inservice_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.77)
+
+    download_button = tk.Button(esti_background, text='Export', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Esthetics'))
+    download_button.place(relheight=.1,relwidth=.1, relx=.9,rely=0)
+
+ 
     submit_button = tk.Button(esti_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Esthetics'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
-
-
+    
 
     tv1 = get_treeview(fresh_am, esti_background)
     
     tv1.place(relheight=1, relwidth=1)
 
 
-
     back_button = tk.Button(esti_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear(esti_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
 
 
 def new_hours_treeview(data, background, tree):
@@ -815,6 +816,43 @@ def new_hours_treeview(data, background, tree):
 
     for x in range(len(tree['column'])):
         tree.heading(f'{x}', text=data.columns[x])
+
+def inservice_day(background, tree):
+    student_id = []
+    first_name = []
+    last_name = []
+    clock_in = []
+    clock_out = []
+
+
+    for child in tree.get_children():
+        student_id.append(tree.item(child)['values'][0])
+        first_name.append(tree.item(child)['values'][1])
+        last_name.append(tree.item(child)['values'][2])
+        clock_in.append(tree.item(child)['values'][3])
+        clock_out.append(tree.item(child)['values'][4])
+
+    if '9:00' in clock_in[0] and '3:00' in clock_out[0]:
+        df = pd.DataFrame(columns=['Acct', 'Name', 'Last name', 'clock in', 'clock out','Date', 'Aissigned Work'])
+        df['Acct'] = student_id
+        df['Name'] = first_name
+        df['Last name'] = last_name
+        df['clock in'] = '9:00 am'
+        df['clock out'] = '4:00 pm'
+        df['Date'] = ' '
+        df['Aissigned Work'] = ' '
+
+    if '4:30' in clock_in[0] and  '9:30' in clock_out[0]:
+        df = pd.DataFrame(columns=['Acct', 'Name', 'Last name', 'clock in', 'clock out','Date', 'Aissigned Work'])
+        df['Acct'] = student_id
+        df['Name'] = first_name
+        df['Last name'] = last_name
+        df['clock in'] = '5:30 pm'
+        df['clock out'] = '9:30 pm'
+        df['Date'] = ' '
+        df['Aissigned Work'] = ' '
+
+    new_hours_treeview(df, background, tree)
 
 
 
@@ -908,7 +946,6 @@ def export_tree(tree, course):
     file_save = asksaveasfilename(filetypes = [("csv file(*.csv)","*.csv"),('All tyes(*.*)', '*.*')], defaultextension = [("csv file(*.csv)","*.csv"),('All tyes(*.*)', '*.*')])
     df.to_csv(file_save, index=False)
 
-    
 def send_hours(tree, course):
     row_list = []
     cols = tree['columns']
@@ -961,8 +998,10 @@ def send_hours(tree, course):
         server.quit()
         success_window()
 
-    else: 
-        fail_window()
+    elif send_clause == ValueError: 
+        fail_date_window()
+    elif send_clause == SyntaxError:
+        fail_hours_window()
 
 
 def status_page(background):
@@ -993,33 +1032,19 @@ def status_page(background):
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
 
 
-def status_show(course):
-    data = get_student_status(course)
-    menu_background.destroy()
-    settings_background =tk.Label(blank_background, bg=main_color)
-    settings_background.place(relheight=1, relwidth=1)
-
-    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(settings_background))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
-
-    title_label = tk.Label(settings_background, text = 'Unpaid Students', bg=main_color, fg='black', font=('Times', '36','bold'))
-    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
-
-
-    data_frame = tk.LabelFrame(settings_background)
-    data_frame.place(rely=0.1, relx=0, relheight=.9,relwidth=1)
-
+def status_show(data, background):
+    data_frame = tk.LabelFrame(background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
 
     tv1 = ttk.Treeview(data_frame)
-    tv1.place(relheight=1, relwidth=1)
-
+    
     treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
     tv1.configure(yscrollcommand=treescrolly.set)
     treescrolly.pack(side='right', fill='y')
 
     tv1['column'] = list(data.columns)
     for value in data.columns:
-        tv1.column(value, anchor='w',)
+        tv1.column(value, anchor='w')
     tv1['show'] = 'headings'
 
     for column in tv1['columns']:
@@ -1032,16 +1057,19 @@ def status_show(course):
         tv1.insert('', 'end', values=row)
 
     tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
+
+
+    return tv1 
 
 def status_massage(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
-    data = data[data['Groups'] == 'Massage Therapy']
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[data['Groups'] == 'Massage Therapy']
     data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
@@ -1055,20 +1083,22 @@ def status_massage(background):
 
 
 
-
-    tv1 = get_treeview(data, settings_background)
+    tv1 = status_show(data, settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
 def status_cos(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
-    data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
+
+    data['Groups'] = data['Groups'].str.replace('Cosmetology Full Time', 'FT')
+    data['Groups'] = data['Groups'].str.replace('Cosmetology Part Time', 'PT')
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1079,17 +1109,15 @@ def status_cos(background):
     title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    cos_am = data[data['Groups'] == 'Cosmetology Full Time'].sort_values('Tot hrs', ascending=False)
+    cos_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
     cos_am_view = tk.Button(settings_background, text='Day Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_am, settings_background, tv1))
     cos_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    cos_pm = data[data['Groups'] == 'Cosmetology Part Time'].sort_values('Tot hrs', ascending=False)
+    cos_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
     cos_pm_view = tk.Button(settings_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm, settings_background, tv1))
     cos_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
-
-
-    tv1 = get_treeview(data, settings_background)
+    tv1 = status_show(data, settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
@@ -1097,12 +1125,14 @@ def status_cos(background):
 def status_esti(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
-    data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
+    data['Groups'] = data['Groups'].str.replace('Esthetics Full Time', 'FT')
+    data['Groups'] = data['Groups'].str.replace('Esthetics Part Time', 'PT')
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1113,29 +1143,58 @@ def status_esti(background):
     title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    esti_am = data[data['Groups'] == 'Esthetics Full Time'].sort_values('Tot hrs', ascending=False)
-    esti_am_view = tk.Button(settings_background, text='Day Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_am, settings_background, tv1))
-    esti_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    esti_pm = data[data['Groups'] == 'Esthetics Part Time'].sort_values('Tot hrs', ascending=False)
-    esti_pm_view = tk.Button(settings_background, text='Night Esthetics', bg='black', fg='white', command= lambda: get_small_treeview(esti_pm, settings_background, tv1))
-    esti_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
+    esti_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
+    esti_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
 
 
 
-    tv1 = get_treeview(data, settings_background)
+
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+
+
+
+    fresh_am = esti_am[esti_am['Tot hrs'] < 290]
+    esti_hours_FRam = tk.Button(settings_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: get_small_treeview(fresh_am, settings_background, tv1))
+    esti_hours_FRam.place(relheight=.1,relwidth=.2, relx=.01,rely=.77)
+
+    fresh_pm = esti_pm[esti_pm['Tot hrs'] < 290]
+    esti_hours_FRpm = tk.Button(settings_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(fresh_pm, settings_background, tv1))
+    esti_hours_FRpm.place(relheight=.1,relwidth=.2, relx=.01,rely=.88)
+
+    jr_am = esti_am[(esti_am['Tot hrs'] > 290) & (esti_am['Tot hrs'] < 690)]
+    esti_hours_JRam = tk.Button(settings_background, text='Junior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(jr_am, settings_background, tv1))
+    esti_hours_JRam.place(relheight=.1,relwidth=.2, relx=.23,rely=.77)
+
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+    esti_hours_JRpm = tk.Button(settings_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(jr_pm, settings_background, tv1))
+    esti_hours_JRpm.place(relheight=.1,relwidth=.2, relx=.23,rely=.88)
+
+    sr_am = esti_am[esti_am['Tot hrs'] >= 690 ]
+    esti_hours_SRam = tk.Button(settings_background, text='Senior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(sr_am, settings_background, tv1))
+    esti_hours_SRam.place(relheight=.1,relwidth=.2, relx=.45,rely=.77)
+
+
+    sr_pm = esti_pm[esti_pm['Tot hrs'] >= 690 ]
+    esti_hours_SRpm = tk.Button(settings_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(sr_pm, settings_background, tv1))
+    esti_hours_SRpm.place(relheight=.1,relwidth=.2, relx=.45,rely=.88)
+
+    tv1 = status_show(data, settings_background)
 
     tv1.place(relheight=1, relwidth=1)
+
 
 def status_nails(background):
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
     data = pd.read_csv(url)
-    data = data[['Acct', 'Name','Groups', 'Tot hrs', 'Tran hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
-    data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data.drop(columns=['Tran hrs'],inplace=True)
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
+    data['Groups'] = data['Groups'].str.replace('Nails Full Time', 'FT')
+    data['Groups'] = data['Groups'].str.replace('Nails Part Time', 'PT')
+    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1146,17 +1205,15 @@ def status_nails(background):
     title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    nail_am = data[data['Groups'] == 'Nails Full Time'].sort_values('Tot hrs', ascending=False)
+    nail_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
     nail_am_view = tk.Button(settings_background, text='Day Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_am, settings_background, tv1))
     nail_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    nail_pm = data[data['Groups'] == 'Nails Part Time'].sort_values('Tot hrs', ascending=False)
+    nail_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
     nail_pm_view = tk.Button(settings_background, text='Night Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_pm, settings_background, tv1))
     nail_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
-
-
-    tv1 = get_treeview(data, settings_background)
+    tv1 = status_show(data, settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
@@ -1207,9 +1264,10 @@ def get_treeview(data, background):
 
 def success_window():
     messagebox.showinfo("Sucess", "Hours Have Been Submitted!") 
-
-def fail_window():
+def fail_date_window():
     messagebox.showerror("Correct Dates Format", "Error Check Date Format is\nMM/DD/YY \nor\nMM/DD/YY - MM/DD/YY for two days") 
+def fail_hours_window():
+    messagebox.showerror("Correct hours Format", "Error Check hour Format is\nH:MM am \nor\nH:MM pm ") 
 
 
 
