@@ -305,7 +305,8 @@ def massage_online_hours():
     data = pd.read_csv(url)
     data = data[['Acct', 'Name', 'Last name', 'Groups']]
     massage_data = data[(data['Groups'] == 'Massage Therapy')].drop(columns=['Groups'])
-
+    massage_data['Name']=massage_data['Name'].str.split(',').str[1]
+    massage_data['Name'] = massage_data['Name'].str.split(' ').str[1]
 
     massage_data['clock in'] =  '9:00 am'
     massage_data['clock out'] = '4:00 pm'   
@@ -484,7 +485,7 @@ def student_status_selected_cos(student_id):
         'L07' : 'Pincurl Set',
         'L08': 'Pincurl & Wave',
         'L09' : 'Roller Set',
-        'L010': 'Comb Out',
+        'L10': 'Comb Out',
         'L11': 'Curling Iron Set',
         'L12' : 'Shampoo/Rinse/Treat',
         'L13': 'Blow Dry Styling',
@@ -538,9 +539,16 @@ def student_status_selected_cos(student_id):
 
     }
 
+    practicaltotals = [50,50,25,25,25,50,25,25,50,50,75,150,75,150,10,10,25,10,5,50,10,20]
     data = data.rename(columns= column_renames)
+    
+    test_data = data[data.columns[26:-9]]
+    practical_data= data[data.columns[4:26]].transpose().reset_index()
 
-    return data
+
+    
+
+    return data,practicaltotals, practical_data, test_data
 
 
 
@@ -549,24 +557,148 @@ def student_status_selected_esti(student_id):
     data = pd.read_csv(url)
 
     data = data[data['Acct'] == student_id]
+    column_renames= {
+       'L01': 'Facial Treatments', 
+       'L02': 'Body Treatments', 
+       'L03' :'Adv Skin', 
+       'L04': 'Skin Analysis & Consult',
+       'L05' : 'Facial Wax', 
+       'L06': 'Body Wax',
+       'L07':'Make-Up', 
+       'L08': 'Sanitation',
+       'L09': 'Business Practice', 
+       'L10':'Extractions', 
+       'W01':'Chap 1 - Found Life Skill',
+       'W02':'Chap 2 - Found Prof Image', 
+       'W03' :'Chap 3 - Found Communicat',
+       'W04' : 'Chap 4 - Found Healthy Pr',
+       'W05' : 'Chap 5 - Found Infec Cont', 
+       'W06':'Chap 6 - Found Chem & Saf', 
+       'W07' : 'Chap 7- Found Electricity', 
+       'W08':'Chap 8 - Found Career Pla', 
+       'W09' :'Chap 9 - Foun On The Job', 
+       'W10':'Chap 10 - Foun Beauty Bus', 
+       'W11' : 'Mid Term Final', 
+       'W12':'State Law', 
+       'W13':'Esthetics Final',
+       'W14':'Resume',
+       'W15':'Chap 1- Fund His & Career',
+        'W16': 'Chap 2- Fund A & P', 
+        'W17':'Chap 3 - Fund Phys & Hst', 
+        'W18':'Chap 4 - Fund Disor & Dis', 
+        'W19':'Chap 5 - Fund Skin Analys', 
+        'W20':'Chap 6 - Fund Skncare Pro', 
+        'W21':'Chap 7 - Fund Trtment RM', 
+        'W22':'Chap 8 - Fund Facial Trea', 
+        'W23':'Chap 9 - Fund Facial Mass', 
+        'W24':'Chap 10 - Fund Devices/Te',
+        'W25':'Chap 11 - Fund Hair Remov', 
+        'W26':"Chap 12 - Fund Make up Es", 
+        'W27':'Chap 13 - Fund Adv Topics'
+    }
 
-    return data
+    practicaltotals = [85,15,50,85,45,15,30,100,25,10]
+    data = data.rename(columns= column_renames)
+    test_data = data[data.columns[14:-9]]
+    practical_data= data[data.columns[4:14]].transpose().reset_index()
+
+
+    return data,practicaltotals, practical_data, test_data
 
 
 
 def student_status_selected_nails(student_id):
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20nails.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20Nails.csv'
     data = pd.read_csv(url)
 
     data = data[data['Acct'] == student_id]
+    column_renames= {
+       'L01': 'Manicure', 
+       'L02': 'Reconditioning Trmt', 
+       'L03' :'Repair Technique', 
+       'L04': 'Hand/Arm Massage',
+       'L05' : 'Pedicure', 
+       'L06': 'Foot/Leg Massage',
+       'L07':'Sculpted Nail', 
+       'L08': 'Tips',
+       'L09': 'Wraps', 
+       'L10':'Business Admin', 
+       'L11':'Sanitation', 
+       'W01':'Ch 1-3  Life Sk/Pro Im/Co',
+       'W02':'Ch 4 Healthy Pro', 
+       'W03' :'Ch 5  Infection Contr',
+       'W04' : 'Ch 6 Chemistry/Chem Safe',
+       'W05' : 'Ch 7 Electricity/Elec Saf', 
+       'W06':'Ch 8,9,10 Career/Job/BeaB', 
+       'W07' : 'Ch 2 Anatomy/Phys', 
+       'W08':'Ch 3 Skin Str, Dis/Dis', 
+       'W09' :'Ch 4 Nail Str,Dis/Dis', 
+       'W10':'Ch 5 Nail Prod Chem', 
+       'W11' : 'Ch 6 Manicuring', 
+       'W12':'Ch 7 Pedicuring', 
+       'W13':'Ch 8 Electric Filing',
+       'W14':'Ch 9 Tips/Forms',
+       'W15':'Ch 10 Nail Resin Systems',
+        'W16': 'Ch 11 Mono Liq/Poly Powde', 
+        'W17':'Ch 12 Gel Nail Enhance', 
+        'W18':'Ch 13 Nail Art', 
+        'W19':'Final', 
+        'W20':'Mock #1', 
+        'W21':'Mock #2', 
+        'W22':'Mock #3', 
+        'W23':'State Law', 
+        'W24':'Resume',
+        'W25':'Business Project'
+    }
 
-    return data
+    practicaltotals = [30,12,12,30,20,20,120,120,120,10,100]
+    data = data.rename(columns= column_renames)
+    test_data = data[data.columns[15:-9]]
+    practical_data= data[data.columns[4:15]].transpose().reset_index()
+
+    return data, practicaltotals,practical_data, test_data
 
 
 def student_status_selected_massage(student_id):
-    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20massage.csv'
+    url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp%20Massage.csv'
     data = pd.read_csv(url)
 
     data = data[data['Acct'] == student_id]
+    column_renames= {
+       'L01': 'Sports Massage', 
+       'L02': 'Trigger Point', 
+       'L03' :'Reflexology', 
+       'L04': 'Swedish Massage',
+       'L05' : 'Deep Tissue', 
+       'L06': '30 min',
+       'L07':'60 min', 
+       'L08': '90 min',
+       'L09': '120 min', 
+       'L10':'Chair Massage', 
+       'L11':'Cupping Massage', 
+       'L12':'Hot Stone', 
+       'L13':'Foot Scrub', 
+       'L14':'Dry Brushing', 
+       'L15':'Facial Massage', 
+       'L16':'Energy Work', 
+       'L17':'Special Pops', 
+       'W01':'Intro Massag',
+       'W02':'Anat/Phy 1', 
+       'W03' :'Path/Med Term',
+       'W04' : 'TherMass/Body',
+       'W05' : 'Anat/Phy 2', 
+       'W06':'Sp Pop/Trmt', 
+       'W07' : 'Kin/ Sp Trmt', 
+       'W08':'Ener/Asian Ther', 
+       'W09' :'Decomp Ther', 
+       'W10':'Bus Develop', 
+       'W11' : 'Clinic/Prac', 
+       'W12':'Mass Ex Prep', 
+    }
 
-    return data
+    practicaltotals = [3,3,3,3,3,4,20,15,6,3,3,2,2,1,2,1,4]
+    data = data.rename(columns= column_renames)
+    test_data = data[data.columns[21:-9]]
+    practical_data= data[data.columns[4:21]].transpose().reset_index()
+    print(data.columns)
+    return data, practicaltotals,practical_data, test_data
