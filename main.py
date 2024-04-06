@@ -1004,6 +1004,147 @@ def send_hours(tree, course):
         fail_hours_window()
 
 
+
+
+def student_explode_view(data, practicaltotals,practical_data, test_data, background):
+    background.destroy()
+    student_background=tk.Label(blank_background, bg=main_color)
+    student_background.place(relheight=1, relwidth=1)
+    name_data = data.reset_index()
+    
+
+    student_title= tk.Label(student_background, text=name_data.loc[0, 'Name'], bg=main_color, fg='black', font=('Times', '20','bold'))
+    student_title.place(relx=.12, rely=0, relheight=.1, relwidth=.8)
+
+
+    test_data = test_data.fillna(0)
+    test_data = test_data.loc[:, ~(test_data > 84).any()].transpose()
+    test_data = test_data.reset_index()
+    test_data.rename(columns = {'index':"test", test_data.columns[1]: 'score'}, inplace=True)
+
+    practical_data.rename(columns = {'index':"practical", practical_data.columns[1]: 'completed'}, inplace=True)
+    practical_data['required'] = practicaltotals
+    practical_data['remaining'] = practical_data['required'] - practical_data['completed']
+    
+    for row in range(len(practical_data)):
+        if practical_data.loc[row,'completed'] >= practical_data.loc[row,'required']:
+            practical_data.drop(labels = row, axis=0, inplace=True)
+
+
+
+    data=data.reset_index()
+    
+
+    studentTotHrs_label = tk.Label(student_background, text=f"Hours: \n{data.loc[0, 'Tot hrs']}", bg=main_color, font=('Times', '12','bold'))
+    studentTotHrs_label.place(rely=0.16, relx=0,relheight=.07,relwidth=.17, anchor='w')
+
+
+    studentTranHrs_label = tk.Label(student_background, text=f"Transfer: \n{data.loc[0, 'Tran hrs']}", bg=main_color, font=('Times', '12','bold'))
+    studentTranHrs_label.place(rely=0.26, relx=0,relheight=.07,relwidth=.17, anchor='w')
+
+
+    studentAbsHrs_label = tk.Label(student_background, text=f"Absent: \n{data.loc[0, 'Abs hrs']}", bg=main_color, font=('Times', '12','bold'))
+    studentAbsHrs_label.place(rely=0.36, relx=0,relheight=.07,relwidth=.17, anchor='w')
+
+
+    studentMkuHrs_label = tk.Label(student_background, text=f'Make-Up: \n{data.loc[0, "MU hrs"]}', bg=main_color, font=('Times', '12','bold'))
+    studentMkuHrs_label.place(rely=0.46, relx=0,relheight=.07,relwidth=.17, anchor='w')
+
+    studentPercent_label = tk.Label(student_background, text=f"Atnd %: \n{data.loc[0, 'Atnd %']}", bg=main_color, font=('Times', '12','bold'))
+    studentPercent_label.place(rely=.56, relx=0,relheight=.07,relwidth=.18, anchor='w')
+
+
+
+    studentStart_label = tk.Label(student_background, text=f"Start Date: \n{data.loc[0, 'Start']}", bg=main_color, font=('Times', '12','bold'))
+    studentStart_label.place(rely=0.18, relx=.25,relheight=.07,relwidth=.18, anchor='w')
+
+
+    studentGrad_label = tk.Label(student_background, text=f"Grad Date: \n{data.loc[0, 'Rev grad']}", bg=main_color, font=('Times', '12','bold'))
+    studentGrad_label.place(rely=0.28, relx=.25,relheight=.07,relwidth=.18, anchor='w')
+
+
+    studentLDA_label = tk.Label(student_background, text=f"Last Day Attended: \n{data.loc[0, 'LDA']}", bg=main_color, font=('Times', '12','bold'))
+    studentLDA_label.place(rely=0.38, relx=.25,relheight=.07,relwidth=.19, anchor='w')
+
+
+
+
+
+
+
+    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(student_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    practical_tv = student_academics_view(practical_data,student_background ,rely=0.15, relx=0.45, relheight=.85,relwidth=.55)
+    practical_tv.place(relheight=1, relwidth=1)
+
+
+    test_tv = student_academics_view(test_data,student_background, rely=0.5, relx=0, relheight=.55,relwidth=.4)
+    test_tv.place(relheight=1, relwidth=1)
+
+
+
+
+def student_academics_view(data,background, rely, relx, relheight, relwidth): 
+
+    data_frame = tk.LabelFrame(background)
+    data_frame.place(rely=rely, relx=relx, relheight=relheight, relwidth=relwidth)
+
+    tv1 = ttk.Treeview(data_frame)
+
+    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
+    tv1.configure(yscrollcommand=treescrolly.set)
+    treescrolly.pack(side='right', fill='y')
+
+    tv1['column'] = list(data.columns)
+    tv1.column(data.columns[0], anchor='w')
+    
+
+    for value in data.columns[1:]:
+        
+        tv1.column(value, anchor='c')
+    tv1['show'] = 'headings'
+
+    for column in tv1['columns']:
+        tv1.heading(column, text=column)
+        tv1.column(column, width=data_frame.winfo_width())
+
+    df_rows = data.to_numpy().tolist()
+
+    for row in df_rows:
+        tv1.insert('', 'end', values=row)
+
+    return tv1
+
+    
+
+
+  
+
+
+
+def select_student(tree,course, background,  x):
+    for y in tree.selection():
+        selected_student_id=tree.item(y, 'values')[0]
+
+    if course == 'cos':
+        data, practicaltotals,practical_data, test_data = student_status_selected_cos(int(selected_student_id))
+    if course == 'esti':
+        data, practicaltotals,practical_data, test_data = student_status_selected_esti(int(selected_student_id))
+    if course == 'nails':
+        data, practicaltotals,practical_data, test_data = student_status_selected_nails(int(selected_student_id))
+
+    if course == 'massage':
+        data, practicaltotals,practical_data, test_data = student_status_selected_massage(int(selected_student_id))
+
+    
+    
+    student_explode_view(data, practicaltotals,practical_data, test_data, background)
+  
+
+
+
+
 def status_page(background):
     background.destroy()
     status_background=tk.Label(blank_background, bg=main_color)
@@ -1032,7 +1173,7 @@ def status_page(background):
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
 
 
-def status_show(data, background):
+def status_show(data, course, background):
     data_frame = tk.LabelFrame(background)
     data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
 
@@ -1057,7 +1198,7 @@ def status_show(data, background):
         tv1.insert('', 'end', values=row)
 
     tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
-    tv1.bind('<1>',  lambda x: edit_tree(tv1, x))
+    tv1.bind('<Double-Button-1>',  lambda x: select_student(tv1, course, background, x))
 
 
     return tv1 
@@ -1083,7 +1224,7 @@ def status_massage(background):
 
 
 
-    tv1 = status_show(data, settings_background)
+    tv1 = status_show(data, 'massage',settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
@@ -1117,7 +1258,7 @@ def status_cos(background):
     cos_pm_view = tk.Button(settings_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm, settings_background, tv1))
     cos_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
-    tv1 = status_show(data, settings_background)
+    tv1 = status_show(data, 'cos', settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
@@ -1179,7 +1320,7 @@ def status_esti(background):
     esti_hours_SRpm = tk.Button(settings_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(sr_pm, settings_background, tv1))
     esti_hours_SRpm.place(relheight=.1,relwidth=.2, relx=.45,rely=.88)
 
-    tv1 = status_show(data, settings_background)
+    tv1 = status_show(data, 'esti',settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
@@ -1213,7 +1354,7 @@ def status_nails(background):
     nail_pm_view = tk.Button(settings_background, text='Night Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_pm, settings_background, tv1))
     nail_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
 
-    tv1 = status_show(data, settings_background)
+    tv1 = status_show(data, 'nails',settings_background)
 
     tv1.place(relheight=1, relwidth=1)
 
