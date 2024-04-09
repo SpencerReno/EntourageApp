@@ -58,7 +58,7 @@ settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 #     root.geometry('300x300')
 #     main_background =tk.Label(blank_background, bg=main_color)
 #     main_background.place(relheight=1, relwidth=1)
-#     update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='black',font=('Times', '15','bold'))
+#     update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='gray',font=('Times', '15','bold'))
 #     update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
 
 #     url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
@@ -120,7 +120,7 @@ def show_menu():
     main_background.place(relheight=1, relwidth=1)
 
 
-    directors_ed = tk.Label(main_background, text="INSTRUCTORS EDITION", bg=main_color, fg='black', font=('Times', '36','bold'))
+    directors_ed = tk.Label(main_background, text="INSTRUCTORS EDITION", bg=main_color, fg='gray', font=('Times', '36','bold'))
     directors_ed.place(relx=.07, rely=.05, relheight=.15, relwidth=.9)
 
     entourage_logo = tk.Label(main_background, width=w, height=h,image=EN_photo,bg=main_color)
@@ -159,7 +159,7 @@ def hours_menu(main_background):
     menu_background.place(relheight=1, relwidth=1)
 
 
-    hours_title= tk.Label(menu_background, text="HOURS CREATION", bg=main_color, fg='black', font=('Times', '36','bold'))
+    hours_title= tk.Label(menu_background, text="HOURS CREATION", bg=main_color, fg='gray', font=('Times', '36','bold'))
     hours_title.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
 
     menu_cos = tk.Button(menu_background, text='Cosmetology', bg='black', fg='white', command=lambda: cos(menu_background))
@@ -233,7 +233,7 @@ def settings_page():
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Students Held Back', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Students Held Back', bg=main_color, fg='gray', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
 
@@ -328,7 +328,7 @@ def cos(background):
     cos_hours_background =tk.Label(blank_background, bg=main_color)
     cos_hours_background.place(relheight=1, relwidth=1)
 
-    title_label = tk.Label(cos_hours_background, text = 'Cosmetology Online Hours', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label = tk.Label(cos_hours_background, text = 'Cosmetology Online Hours', bg=main_color, fg='gray', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
    
@@ -361,7 +361,7 @@ def massage(background):
     massage_hours_background =tk.Label(blank_background, bg=main_color)
     massage_hours_background.place(relheight=1, relwidth=1)
 
-    title_label = tk.Label(massage_hours_background, text = 'Massage Online Hours', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label = tk.Label(massage_hours_background, text = 'Massage Online Hours', bg=main_color, fg='gray', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     download_button = tk.Button(massage_hours_background, text='Export', bg='Black', fg='white', activebackground='black',command= lambda: export_tree(tv1, 'Massage'))
@@ -392,7 +392,7 @@ def nails(background):
     entourage_logo = tk.Label(nails_background, width=w, height=h,image=EN_photo,bg=main_color)
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
 
-    nails_title = tk.Label(nails_background, text='NAILS ONLINE HOURS', bg = main_color, fg='black', font=('Times', '36','bold'))
+    nails_title = tk.Label(nails_background, text='NAILS ONLINE HOURS', bg = main_color, fg='gray', font=('Times', '36','bold'))
     nails_title.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     nail_am_view = tk.Button(nails_background, text='Day Nails', bg='black', fg='white', command= lambda: new_hours_treeview(nails_full, nails_background, tv1))
@@ -426,7 +426,7 @@ def esti(background):
     esti_background=tk.Label(blank_background, bg=main_color)
     esti_background.place(relheight=1, relwidth=1)
 
-    esti_title = tk.Label(esti_background, text='ESTHETICS ONLINE HOURS', bg = main_color, fg='black', font=('Times', '25','bold'))
+    esti_title = tk.Label(esti_background, text='ESTHETICS ONLINE HOURS', bg = main_color, fg='gray', font=('Times', '25','bold'))
     esti_title.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     esti_hours_FRam = tk.Button(esti_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: new_hours_treeview(fresh_am, esti_background, tv1))
@@ -674,7 +674,7 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, date, 
     name_data = data.reset_index()
     
 
-    student_title= tk.Label(student_background, text=name_data.loc[0, 'Name'], bg=main_color, fg='black', font=('Times', '20','bold'))
+    student_title= tk.Label(student_background, text=name_data.loc[0, 'Name'], bg=main_color, fg='grey', font=('Times', '20','bold'))
     student_title.place(relx=.12, rely=0, relheight=.1, relwidth=.8)
 
 
@@ -694,44 +694,44 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, date, 
 
 
     data=data.reset_index()
+    
 
-
-    studentTotHrs_label = tk.Label(student_background, text=f"Hours: \n{data.loc[0, 'Tot hrs']}", bg=main_color, font=('Times', '12','bold'))
+    studentTotHrs_label = tk.Label(student_background, text=f"Hours: \n{data.loc[0, 'Tot hrs']}", bg=main_color, fg='whitesmoke', font=('Times', '12','bold'))
     studentTotHrs_label.place(rely=0.16, relx=0,relheight=.07,relwidth=.17, anchor='w')
 
 
-    studentTranHrs_label = tk.Label(student_background, text=f"Transfer: \n{data.loc[0, 'Tran hrs']}", bg=main_color, font=('Times', '12','bold'))
+    studentTranHrs_label = tk.Label(student_background, text=f"Transfer: \n{data.loc[0, 'Tran hrs']}", bg=main_color, fg='whitesmoke', font=('Times', '12','bold'))
     studentTranHrs_label.place(rely=0.26, relx=0,relheight=.07,relwidth=.17, anchor='w')
 
 
-    studentAbsHrs_label = tk.Label(student_background, text=f"Absent: \n{data.loc[0, 'Abs hrs']}", bg=main_color, font=('Times', '12','bold'))
+    studentAbsHrs_label = tk.Label(student_background, text=f"Absent: \n{data.loc[0, 'Abs hrs']}", bg=main_color, fg='whitesmoke', font=('Times', '12','bold'))
     studentAbsHrs_label.place(rely=0.36, relx=0,relheight=.07,relwidth=.17, anchor='w')
 
 
-    studentMkuHrs_label = tk.Label(student_background, text=f'Make-Up: \n{data.loc[0, "MU hrs"]}', bg=main_color, font=('Times', '12','bold'))
+    studentMkuHrs_label = tk.Label(student_background, text=f'Make-Up: \n{data.loc[0, "MU hrs"]}', bg=main_color, fg='whitesmoke', font=('Times', '12','bold'))
     studentMkuHrs_label.place(rely=0.46, relx=0,relheight=.07,relwidth=.17, anchor='w')
 
-    studentPercent_label = tk.Label(student_background, text=f"Atnd %: \n{data.loc[0, 'Atnd %']}", bg=main_color, font=('Times', '12','bold'))
-    studentPercent_label.place(rely=.56, relx=0,relheight=.07,relwidth=.18, anchor='w')
+
+    studentStart_label = tk.Label(student_background, text=f"Start Date: \n{data.loc[0, 'Start']}", bg=main_color, fg='whitesmoke', font=('Times', '12','bold'))
+    studentStart_label.place(rely=0.16, relx=.25,relheight=.07,relwidth=.18, anchor='w')
 
 
-
-    studentStart_label = tk.Label(student_background, text=f"Start Date: \n{data.loc[0, 'Start']}", bg=main_color, font=('Times', '12','bold'))
-    studentStart_label.place(rely=0.18, relx=.25,relheight=.07,relwidth=.18, anchor='w')
-
-
-    studentGrad_label = tk.Label(student_background, text=f"Grad Date: \n{data.loc[0, 'Rev grad']}", bg=main_color, font=('Times', '12','bold'))
-    studentGrad_label.place(rely=0.28, relx=.25,relheight=.07,relwidth=.18, anchor='w')
+    studentGrad_label = tk.Label(student_background, text=f"Grad Date: \n{data.loc[0, 'Rev grad']}", bg=main_color, fg='whitesmoke',font=('Times', '12','bold'))
+    studentGrad_label.place(rely=0.26, relx=.25,relheight=.07,relwidth=.18, anchor='w')
 
 
-    studentLDA_label = tk.Label(student_background, text=f"Last Day Attended: \n{data.loc[0, 'LDA']}", bg=main_color, font=('Times', '12','bold'))
-    studentLDA_label.place(rely=0.38, relx=.25,relheight=.07,relwidth=.19, anchor='w')
+    studentLDA_label = tk.Label(student_background, text=f"Last Day Attended: \n{data.loc[0, 'LDA']}", bg=main_color, fg='whitesmoke', font=('Times', '12','bold'))
+    studentLDA_label.place(rely=0.36, relx=.25,relheight=.07,relwidth=.19, anchor='w')
 
+    studentPercent_label = tk.Label(student_background, text=f"Atnd Percentage: \n{data.loc[0, 'Atnd %']}", bg=main_color, fg='whitesmoke',font=('Times', '12','bold'))
+    studentPercent_label.place(rely=.46, relx=0.25,relheight=.07,relwidth=.18, anchor='w')
 
 
 
     update_date_label = tk.Label(student_background, text=f'Last updated: \n{str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
     update_date_label.place(relx=.85, rely= .02)
+
+
 
 
 
@@ -818,7 +818,7 @@ def status_page(background):
     status_background=tk.Label(blank_background, bg=main_color)
     status_background.place(relheight=1, relwidth=1)
 
-    hours_title= tk.Label(status_background, text="Student Status", bg=main_color, fg='black', font=('Times', '36','bold'))
+    hours_title= tk.Label(status_background, text="Student Status", bg=main_color, fg='gray', font=('Times', '36','bold'))
     hours_title.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
 
     menu_cos = tk.Button(status_background, text='Cosmetology', bg='black', fg='white', command=lambda: status_cos(status_background))
@@ -846,7 +846,8 @@ def status_show(data, course, background):
     data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
 
     tv1 = ttk.Treeview(data_frame)
-    
+    if 'Groups' in data.columns:
+        data.drop(columns=['Groups'],inplace=True)
     treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
     tv1.configure(yscrollcommand=treescrolly.set)
     treescrolly.pack(side='right', fill='y')
@@ -887,7 +888,7 @@ def status_massage(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Massage Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Massage Student Status', bg=main_color, fg='gray', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
 
@@ -915,7 +916,7 @@ def status_cos(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='gray', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     cos_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
@@ -949,7 +950,7 @@ def status_esti(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='black', font=('Times', '30','bold'))
+    title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='gray', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
 
@@ -1011,7 +1012,7 @@ def status_nails(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='black', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='gray', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
     nail_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
@@ -1031,7 +1032,8 @@ def get_small_treeview(data, background, tree):
 
     for item in tree.get_children():
       tree.delete(item)
-
+    if 'Groups' in data.columns:
+        data.drop(columns= ['Groups'], inplace=True)
     df_rows = data.to_numpy().tolist()
     for row in df_rows:
         tree.insert('', 'end', values=row)
