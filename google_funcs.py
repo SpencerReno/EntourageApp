@@ -702,3 +702,41 @@ def student_status_selected_massage(student_id):
     practical_data= data[data.columns[4:21]].transpose().reset_index()
     print(data.columns)
     return data, practicaltotals,practical_data, test_data
+
+
+def get_update_date(item):
+    from github import Github
+    g = Github()
+    repo = g.get_repo("SpencerReno/EntourageApp")
+
+    if item == 'hours':
+        commits = repo.get_commits(path='CSV Files/EntourageApp.csv')
+        if commits.totalCount:
+            date = commits[0].commit.committer.date
+
+    elif item == 'cos_status':
+        commits = repo.get_commits(path='CSV Files/EntourageApp Cos.csv')
+        if commits.totalCount:
+            date = commits[0].commit.committer.date
+
+
+    elif item == 'esti_status':
+        commits = repo.get_commits(path='CSV Files/EntourageApp Esti.csv')
+        if commits.totalCount:
+            date = commits[0].commit.committer.date
+
+
+    elif item == 'massage_status':
+        commits = repo.get_commits(path='CSV Files/EntourageApp Massage.csv')
+        if commits.totalCount:
+            date = commits[0].commit.committer.date
+
+
+    elif item == 'nails_status':
+        commits = repo.get_commits(path='CSV Files/EntourageApp Nails.csv')
+        if commits.totalCount:
+            date = commits[0].commit.committer.date
+
+    date = date.strftime("%m/%d/%Y")
+    return date
+    

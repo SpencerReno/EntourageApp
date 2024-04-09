@@ -183,7 +183,10 @@ def hours_menu(main_background):
 
     settings_button = tk.Button(menu_background,width=w, height=h, image=settings_photo, bg=main_color, activebackground=main_color, borderwidth=0, command= lambda: password())
     settings_button.place(relheight=.09,relwidth=.09, relx=.9, rely=.04)
-    
+
+    date = get_update_date('hours')
+    update_date_label = tk.Label(menu_background, text=f'Last updated: {str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
+    update_date_label.place(relx=.39, rely= .02)
 
     entourage_logo = tk.Label(menu_background, width=w, height=h,image=EN_photo,bg=main_color)
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
@@ -342,6 +345,7 @@ def cos(background):
     submit_button = tk.Button(cos_hours_background, text='Submit Hours', bg='Black', fg='white', activebackground='black',command= lambda: send_hours(tv1, 'Cosmetology'))
     submit_button.place(relheight=.1,relwidth=.25, relx=.75,rely=.88)
     
+
 
     tv1 = get_treeview(cos_full, cos_hours_background)
 
@@ -663,7 +667,7 @@ def send_hours(tree, course):
 
 
 
-def student_explode_view(data, practicaltotals,practical_data, test_data, background):
+def student_explode_view(data, practicaltotals,practical_data, test_data, date, background):
     background.destroy()
     student_background=tk.Label(blank_background, bg=main_color)
     student_background.place(relheight=1, relwidth=1)
@@ -690,7 +694,7 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, backgr
 
 
     data=data.reset_index()
-    
+
 
     studentTotHrs_label = tk.Label(student_background, text=f"Hours: \n{data.loc[0, 'Tot hrs']}", bg=main_color, font=('Times', '12','bold'))
     studentTotHrs_label.place(rely=0.16, relx=0,relheight=.07,relwidth=.17, anchor='w')
@@ -726,6 +730,8 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, backgr
 
 
 
+    update_date_label = tk.Label(student_background, text=f'Last updated: \n{str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
+    update_date_label.place(relx=.85, rely= .02)
 
 
 
@@ -785,18 +791,22 @@ def select_student(tree,course, background,  x):
         selected_student_id=tree.item(y, 'values')[0]
 
     if course == 'cos':
+        date =  get_update_date('cos_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_cos(int(selected_student_id))
     if course == 'esti':
+        date =  get_update_date('esti_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_esti(int(selected_student_id))
     if course == 'nails':
+        date =  get_update_date('nails_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_nails(int(selected_student_id))
 
     if course == 'massage':
+        date =  get_update_date('massage_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_massage(int(selected_student_id))
 
     
     
-    student_explode_view(data, practicaltotals,practical_data, test_data, background)
+    student_explode_view(data, practicaltotals,practical_data, test_data, date, background)
   
 
 

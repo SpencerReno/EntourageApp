@@ -524,7 +524,10 @@ def hours_menu(main_background):
 
     settings_button = tk.Button(menu_background,width=w, height=h, image=settings_photo, bg=main_color, activebackground=main_color, borderwidth=0, command= lambda: password())
     settings_button.place(relheight=.09,relwidth=.09, relx=.9, rely=.04)
-    
+
+    date = get_update_date('hours')
+    update_date_label = tk.Label(menu_background, text=f'Last updated: {str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
+    update_date_label.place(relx=.39, rely= .02)    
 
     entourage_logo = tk.Label(menu_background, width=w, height=h,image=EN_photo,bg=main_color)
     entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
@@ -1006,7 +1009,7 @@ def send_hours(tree, course):
 
 
 
-def student_explode_view(data, practicaltotals,practical_data, test_data, background):
+def student_explode_view(data, practicaltotals,practical_data, test_data, date, background):
     background.destroy()
     student_background=tk.Label(blank_background, bg=main_color)
     student_background.place(relheight=1, relwidth=1)
@@ -1067,6 +1070,8 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, backgr
     studentLDA_label.place(rely=0.38, relx=.25,relheight=.07,relwidth=.19, anchor='w')
 
 
+    update_date_label = tk.Label(student_background, text=f'Last updated: \n{str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
+    update_date_label.place(relx=.85, rely= .02)
 
 
 
@@ -1122,24 +1127,27 @@ def student_academics_view(data,background, rely, relx, relheight, relwidth):
   
 
 
-
 def select_student(tree,course, background,  x):
     for y in tree.selection():
         selected_student_id=tree.item(y, 'values')[0]
 
     if course == 'cos':
+        date =  get_update_date('cos_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_cos(int(selected_student_id))
     if course == 'esti':
+        date =  get_update_date('esti_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_esti(int(selected_student_id))
     if course == 'nails':
+        date =  get_update_date('nails_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_nails(int(selected_student_id))
 
     if course == 'massage':
+        date =  get_update_date('massage_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_massage(int(selected_student_id))
 
     
     
-    student_explode_view(data, practicaltotals,practical_data, test_data, background)
+    student_explode_view(data, practicaltotals,practical_data, test_data, date, background)
   
 
 
@@ -1428,6 +1436,10 @@ def get_user_file(background):
         with open(file, 'r') as file:
             data = file.read()
         update_ledger_file(data, git_hub_code)
+    elif file_name in ['EntourageApp Nails.csv','EntourageApp Massage.csv','EntourageApp Esti.csv', 'EntourageApp Cos.csv'] :
+        with open(file, 'r') as file:
+            data = file.read()
+        update_status_file(data, file_name, git_hub_code)
     else:
         messagebox.showerror("showerror", "Check the spelling of file name it is case sensitive\n The only files you can update are\n ledger.csv \n EntourageApp.csv")
 
@@ -1456,6 +1468,17 @@ def update_app_file(file, git_hub_code):
     except:
         repo.create_file('CSV Files/EntourageApp.csv', 'App updated', file,  branch='main')
         messagebox.showinfo('Success!', 'Entourage App file has now been sucessfully updated!')
+
+
+def update_status_file(file, file_name,git_hub_code):
+    g = Github(git_hub_code)
+    repo = g.get_repo('SpencerReno/EntourageApp')
+    try:
+        contents = repo.get_contents(f"CSV Files/{file_name}")
+        repo.update_file(contents.path, 'App updated', file, sha=contents.sha, branch='main')
+        messagebox.showinfo('Success!', f'{file_name} file has now been sucessfully updated!')
+    except:
+        messagebox.showinfo('Error', 'Please Check the name of file matches whats on FAME')
  
 
 def clear(background):
