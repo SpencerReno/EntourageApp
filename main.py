@@ -1009,7 +1009,7 @@ def send_hours(tree, course):
 
 
 
-def student_explode_view(data, practicaltotals,practical_data, test_data, date, background):
+def student_explode_view(data, practicaltotals,practical_data, test_data, date, course, background):
     background.destroy()
     student_background=tk.Label(blank_background, bg=main_color)
     student_background.place(relheight=1, relwidth=1)
@@ -1077,7 +1077,7 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, date, 
 
 
 
-    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(student_background))
+    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_student_explode(student_background, course))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
     practical_tv = student_academics_view(practical_data,student_background ,rely=0.15, relx=0.45, relheight=.85,relwidth=.55)
@@ -1147,8 +1147,10 @@ def select_student(tree,course, background,  x):
 
     
     
-    student_explode_view(data, practicaltotals,practical_data, test_data, date, background)
+    student_explode_view(data, practicaltotals,practical_data, test_data, date, course, background)
   
+
+
 
 
 
@@ -1158,7 +1160,7 @@ def status_page(background):
     status_background=tk.Label(blank_background, bg=main_color)
     status_background.place(relheight=1, relwidth=1)
 
-    hours_title= tk.Label(status_background, text="Student Status", bg=main_color, fg='grey', font=('Times', '36','bold'))
+    hours_title= tk.Label(status_background, text="Student Status", bg=main_color, fg='gray', font=('Times', '36','bold'))
     hours_title.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
 
     menu_cos = tk.Button(status_background, text='Cosmetology', bg='black', fg='white', command=lambda: status_cos(status_background))
@@ -1183,14 +1185,12 @@ def status_page(background):
 
 def status_show(data, course, background):
     data_frame = tk.LabelFrame(background)
-    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+    data_frame.place(rely=0.1, relx=.55, relheight=.9,relwidth=.45)
 
     tv1 = ttk.Treeview(data_frame)
-    
     if 'Groups' in data.columns:
         data.drop(columns=['Groups'],inplace=True)
-
-    
+    data.drop(columns=['Tot hrs'], inplace=True)
     treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
     tv1.configure(yscrollcommand=treescrolly.set)
     treescrolly.pack(side='right', fill='y')
@@ -1202,7 +1202,9 @@ def status_show(data, course, background):
 
     for column in tv1['columns']:
         tv1.heading(column, text=column)
-        tv1.column(column, width=data_frame.winfo_width())
+    tv1.column(tv1['columns'][0], width=50)
+    tv1.column(tv1['columns'][1], width=250)
+
 
     df_rows = data.to_numpy().tolist()
 
@@ -1221,9 +1223,9 @@ def status_massage(background):
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs']]
     data = data[data['Groups'] == 'Massage Therapy']
-    data = data.sort_values('Tot hrs', ascending=False)
+    data = data.sort_values('Name')
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1231,9 +1233,12 @@ def status_massage(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Massage Student Status', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Massage Student Status', bg=main_color, fg='gray', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
+    
+    entourage_logo = tk.Label(settings_background, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.01, rely=.2, relheight=.25, relwidth=.5)
 
 
     tv1 = status_show(data, 'massage',settings_background)
@@ -1246,12 +1251,11 @@ def status_cos(background):
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs']]
     data = data[(data['Groups'] == 'Cosmetology Full Time') | (data['Groups'] == 'Cosmetology Part Time')]
-
+    data = data.sort_values(by='Name')
     data['Groups'] = data['Groups'].str.replace('Cosmetology Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Cosmetology Part Time', 'PT')
-    data = data.sort_values('Tot hrs', ascending=False)
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1259,16 +1263,44 @@ def status_cos(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='grey', font=('Times', '30','bold'))
+    title_label = tk.Label(settings_background, text = 'Cosmetology Student Status', bg=main_color, fg='gray', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    cos_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
-    cos_am_view = tk.Button(settings_background, text='Day Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_am, settings_background, tv1))
-    cos_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
 
-    cos_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
-    cos_pm_view = tk.Button(settings_background, text='Night Cosmetology', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm, settings_background, tv1))
-    cos_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
+    
+    entourage_logo = tk.Label(settings_background, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.01, rely=.2, relheight=.25, relwidth=.5)
+
+
+#Change View to Freshman COS AM 
+    cos_am_fresh = data[(data['Groups'] == 'FT') & (data['Tot hrs'] <= 350)].sort_values(by=['Name'])
+    cos_am_fresh_view = tk.Button(settings_background, text='Day Freshman', bg='black', fg='white', command= lambda: get_small_treeview(cos_am_fresh, settings_background, tv1))
+    cos_am_fresh_view.place(relheight=.1,relwidth=.25, relx=.01,rely=.5)
+
+#Change View to JR Cos AM 
+    cos_am_JR = data[(data['Groups'] == 'FT') & (data['Tot hrs'] <= 1000) & (data['Tot hrs'] >= 350)].sort_values(by=['Name'])
+    cos_am_JR_view = tk.Button(settings_background, text='Day Juniors', bg='black', fg='white', command= lambda: get_small_treeview(cos_am_JR, settings_background, tv1))
+    cos_am_JR_view.place(relheight=.1,relwidth=.25, relx=.01,rely=.64)
+
+#Change View to SR Cos AM 
+    cos_am_SR = data[(data['Groups'] == 'FT') & (data['Tot hrs'] >= 1000)].sort_values(by=['Name'])
+    cos_am_SR_view = tk.Button(settings_background, text='Day Seniors', bg='black', fg='white', command= lambda: get_small_treeview(cos_am_SR, settings_background, tv1))
+    cos_am_SR_view.place(relheight=.1,relwidth=.25, relx=.01,rely=.78)
+
+#Change View to Freshman COS PM 
+    cos_pm_fresh = data[(data['Groups'] == 'PT') & (data['Tot hrs'] <= 350)].sort_values(by=['Name'])
+    cos_pm_fresh_view = tk.Button(settings_background, text='Night Freshman', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm_fresh, settings_background, tv1))
+    cos_pm_fresh_view.place(relheight=.1,relwidth=.25, relx=.28,rely=.5)
+
+#Change View to JR Cos PM
+    cos_pm_JR = data[(data['Groups'] == 'PT') & (data['Tot hrs'] <= 1000) & (data['Tot hrs'] >= 350)].sort_values(by=['Name'])
+    cos_pm_JR_view = tk.Button(settings_background, text='Night Juniors', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm_JR, settings_background, tv1))
+    cos_pm_JR_view.place(relheight=.1,relwidth=.25, relx=.28,rely=.64)
+
+#Change View to SR Cos PM
+    cos_pm_SR = data[(data['Groups'] == 'PT') & (data['Tot hrs'] >= 1000)].sort_values(by=['Name'])
+    cos_pm_SR_view = tk.Button(settings_background, text='Night Seniors', bg='black', fg='white', command= lambda: get_small_treeview(cos_pm_SR, settings_background, tv1))
+    cos_pm_SR_view.place(relheight=.1,relwidth=.25, relx=.28,rely=.78)
 
     tv1 = status_show(data, 'cos', settings_background)
 
@@ -1281,7 +1313,7 @@ def status_esti(background):
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs']]
     data = data[(data['Groups'] == 'Esthetics Full Time') | (data['Groups'] == 'Esthetics Part Time')]
     data['Groups'] = data['Groups'].str.replace('Esthetics Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Esthetics Part Time', 'PT')
@@ -1293,7 +1325,7 @@ def status_esti(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='grey', font=('Times', '30','bold'))
+    title_label = tk.Label(settings_background, text = 'Esthetics Student Status', bg=main_color, fg='gray', font=('Times', '30','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
 
@@ -1305,32 +1337,37 @@ def status_esti(background):
 
     jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
 
+    entourage_logo = tk.Label(settings_background, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.01, rely=.2, relheight=.25, relwidth=.5)
 
 
     fresh_am = esti_am[esti_am['Tot hrs'] < 290]
     esti_hours_FRam = tk.Button(settings_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: get_small_treeview(fresh_am, settings_background, tv1))
-    esti_hours_FRam.place(relheight=.1,relwidth=.2, relx=.01,rely=.77)
+    esti_hours_FRam.place(relheight=.1,relwidth=.25, relx=.01,rely=.5)
 
-    fresh_pm = esti_pm[esti_pm['Tot hrs'] < 290]
-    esti_hours_FRpm = tk.Button(settings_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(fresh_pm, settings_background, tv1))
-    esti_hours_FRpm.place(relheight=.1,relwidth=.2, relx=.01,rely=.88)
 
     jr_am = esti_am[(esti_am['Tot hrs'] > 290) & (esti_am['Tot hrs'] < 690)]
     esti_hours_JRam = tk.Button(settings_background, text='Junior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(jr_am, settings_background, tv1))
-    esti_hours_JRam.place(relheight=.1,relwidth=.2, relx=.23,rely=.77)
-
-    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
-    esti_hours_JRpm = tk.Button(settings_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(jr_pm, settings_background, tv1))
-    esti_hours_JRpm.place(relheight=.1,relwidth=.2, relx=.23,rely=.88)
+    esti_hours_JRam.place(relheight=.1,relwidth=.25, relx=.01,rely=.64)
 
     sr_am = esti_am[esti_am['Tot hrs'] >= 690 ]
     esti_hours_SRam = tk.Button(settings_background, text='Senior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(sr_am, settings_background, tv1))
-    esti_hours_SRam.place(relheight=.1,relwidth=.2, relx=.45,rely=.77)
+    esti_hours_SRam.place(relheight=.1,relwidth=.25, relx=.01,rely=.78)
+
+
+
+    fresh_pm = esti_pm[esti_pm['Tot hrs'] < 290]
+    esti_hours_FRpm = tk.Button(settings_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(fresh_pm, settings_background, tv1))
+    esti_hours_FRpm.place(relheight=.1,relwidth=.25, relx=.28,rely=.5)
+
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+    esti_hours_JRpm = tk.Button(settings_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(jr_pm, settings_background, tv1))
+    esti_hours_JRpm.place(relheight=.1,relwidth=.25, relx=.28,rely=.64)
 
 
     sr_pm = esti_pm[esti_pm['Tot hrs'] >= 690 ]
     esti_hours_SRpm = tk.Button(settings_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(sr_pm, settings_background, tv1))
-    esti_hours_SRpm.place(relheight=.1,relwidth=.2, relx=.45,rely=.88)
+    esti_hours_SRpm.place(relheight=.1,relwidth=.25, relx=.28,rely=.78)
 
     tv1 = status_show(data, 'esti',settings_background)
 
@@ -1343,11 +1380,11 @@ def status_nails(background):
     data['Tot hrs']=data['Tot hrs'].str.replace(',', '')
     data['Tot hrs'] = data['Tot hrs'].astype(float)
     data['Tot hrs'] = data['Tot hrs'] + data['Tran hrs']
-    data = data[['Acct', 'Name', 'Groups', 'Tot hrs', 'Remain hrs', 'Atnd %', 'Rev grad']]
+    data = data[['Acct', 'Name', 'Groups', 'Tot hrs']]
     data = data[(data['Groups'] == 'Nails Full Time') | (data['Groups'] == 'Nails Part Time')]
     data['Groups'] = data['Groups'].str.replace('Nails Full Time', 'FT')
     data['Groups'] = data['Groups'].str.replace('Nails Part Time', 'PT')
-    data = data.sort_values('Tot hrs', ascending=False)
+    data = data.sort_values('Name')
     background.destroy()
     settings_background =tk.Label(blank_background, bg=main_color)
     settings_background.place(relheight=1, relwidth=1)
@@ -1355,16 +1392,19 @@ def status_nails(background):
     back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_status(settings_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
-    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label = tk.Label(settings_background, text = 'Nail Student Status', bg=main_color, fg='gray', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
-    nail_am = data[data['Groups'] == 'FT'].sort_values('Tot hrs', ascending=False)
-    nail_am_view = tk.Button(settings_background, text='Day Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_am, settings_background, tv1))
-    nail_am_view.place(relheight=.1,relwidth=.25, relx=.23,rely=.85)
+    entourage_logo = tk.Label(settings_background, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.01, rely=.2, relheight=.25, relwidth=.5)
 
-    nail_pm = data[data['Groups'] == 'PT'].sort_values('Tot hrs', ascending=False)
+    nail_am = data[data['Groups'] == 'FT'].sort_values('Name')
+    nail_am_view = tk.Button(settings_background, text='Day Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_am, settings_background, tv1))
+    nail_am_view.place(relheight=.1,relwidth=.25, relx=.01,rely=.5)
+
+    nail_pm = data[data['Groups'] == 'PT'].sort_values('Name')
     nail_pm_view = tk.Button(settings_background, text='Night Nails', bg='black', fg='white', command= lambda: get_small_treeview(nail_pm, settings_background, tv1))
-    nail_pm_view.place(relheight=.1,relwidth=.25, relx=.52,rely=.85)
+    nail_pm_view.place(relheight=.1,relwidth=.25, relx=.28,rely=.5)
 
     tv1 = status_show(data, 'nails',settings_background)
 
@@ -1495,6 +1535,16 @@ def clear_status(background):
 
 def clear_100(background):
     final_100_page(background)
+
+def clear_student_explode(background, course):
+    if course == 'esti':
+        status_esti(background)
+    if course == 'cos':
+        status_cos(background)
+    if course == 'nails':
+        status_nails(background)
+    if course == 'massage':
+        status_massage(background)
 
 def clear_main(background):
     background.destroy()

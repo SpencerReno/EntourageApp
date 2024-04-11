@@ -409,17 +409,18 @@ def get_download_clock_file(df):
                     year = int(str(datetime.date.today().year)[-2:])
 
 
-
+           ## FIX ERROR HERE !!!!!!!
                 intime = df['clock in'].iloc[x][:4].strip(' ')
                 in_condition = df['clock in'].iloc[x][4:].strip(' ')
                 outtime = df['clock out'].iloc[x][:4].strip(' ')
                 out_condition = df['clock out'].iloc[x][4:].strip(' ')
-                if in_condition != 'am' or in_condition != 'pm':
+                print(intime, in_condition, outtime, out_condition)
+                if  'am' not in in_condition or  'pm' not in in_condition:
                     raise SyntaxError
             
-                if out_condition != 'am' or out_condition != 'pm':
+                if  'am' not in out_condition  or  'am' not in out_condition:
                     raise SyntaxError
-
+                print('here')
                 in_time_hour = intime.split(':')[0]
                 if len(in_time_hour) < 2 and 'am' in in_condition:
                     in_time_hour =f'0{in_time_hour}'
@@ -446,6 +447,7 @@ def get_download_clock_file(df):
                         1 : f'{year}{month}{day}{out_time_hour}{str(outtime.split(":")[1])}00'.replace(' ', ''),
                         2: f'50000M00000{student_id}'.replace(' ', '')
                     }   
+                print(clock_in)
                 clocked_hours = clocked_hours.append(clock_in, ignore_index=True)
                 clocked_hours=clocked_hours.append(clock_out, ignore_index=True)
 
