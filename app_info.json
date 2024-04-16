@@ -1,5 +1,5 @@
 {"info":{
     "APP_VERSION": "1.0.0",
     "APP_NAME": "ENTOURAGE_DASHBOARD", 
-    "HOURS_EMAIL" : "sreno@entouragebeauty.com"}
+    "HOURS_EMAIL" : ["sreno@entouragebeauty.com"]}
 }
