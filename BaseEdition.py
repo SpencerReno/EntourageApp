@@ -624,12 +624,15 @@ def send_hours(tree, course):
         info = requests.get(url).json()
 
         from_addr = 'eibehours@outlook.com'
-        to_addr = info['info']['HOURS_EMAIL']
+        to_addr = []
+        for email in info['info']['HOURS_EMAIL']:
+            to_addr.append(str(email))
+        print(to_addr)
         subject = 'Hours'
 
         msg = MIMEMultipart()
         msg['From'] = from_addr
-        msg['To'] = to_addr
+        msg['To'] = ", ".join(to_addr)
         msg['Subject'] = subject
         body = MIMEText(f'New {course} hours!', 'plain')
 
@@ -656,7 +659,7 @@ def send_hours(tree, course):
         server.starttls()
         server.ehlo()
         server.login(from_addr, 'coldL!ght65#')
-        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        server.sendmail(from_addr, to_addr, msg.as_string())
         server.quit()
         success_window()
 
@@ -664,6 +667,8 @@ def send_hours(tree, course):
         fail_date_window()
     elif send_clause == SyntaxError:
         fail_hours_window()
+    elif send_clause == SyntaxWarning:
+        fail_hours_mixup()
 
 
 
@@ -671,6 +676,10 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, date, 
     background.destroy()
     student_background=tk.Label(blank_background, bg=main_color)
     student_background.place(relheight=1, relwidth=1)
+    
+    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_student_explode(student_background, course))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
     name_data = data.reset_index()
     
 
@@ -733,10 +742,6 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, date, 
 
 
 
-
-
-    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_student_explode(student_background, course))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
     practical_tv = student_academics_view(practical_data,student_background ,rely=0.15, relx=0.45, relheight=.85,relwidth=.55)
     practical_tv.place(relheight=1, relwidth=1)
@@ -994,37 +999,37 @@ def status_esti(background):
 
 
 
-    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)].sort_values(by=['Name'])
 
     entourage_logo = tk.Label(settings_background, width=w, height=h,image=EN_photo,bg=main_color)
     entourage_logo.place(relx=.01, rely=.2, relheight=.25, relwidth=.5)
 
 
-    fresh_am = esti_am[esti_am['Tot hrs'] < 290]
+    fresh_am = esti_am[esti_am['Tot hrs'] < 290].sort_values(by=['Name'])
     esti_hours_FRam = tk.Button(settings_background, text='Freshman AM', bg='maroon', fg='white', command= lambda: get_small_treeview(fresh_am, settings_background, tv1))
     esti_hours_FRam.place(relheight=.1,relwidth=.25, relx=.01,rely=.5)
 
 
-    jr_am = esti_am[(esti_am['Tot hrs'] > 290) & (esti_am['Tot hrs'] < 690)]
+    jr_am = esti_am[(esti_am['Tot hrs'] > 290) & (esti_am['Tot hrs'] < 690)].sort_values(by=['Name'])
     esti_hours_JRam = tk.Button(settings_background, text='Junior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(jr_am, settings_background, tv1))
     esti_hours_JRam.place(relheight=.1,relwidth=.25, relx=.01,rely=.64)
 
-    sr_am = esti_am[esti_am['Tot hrs'] >= 690 ]
+    sr_am = esti_am[esti_am['Tot hrs'] >= 690 ].sort_values(by=['Name'])
     esti_hours_SRam = tk.Button(settings_background, text='Senior AM', bg='maroon', fg='white', command= lambda: get_small_treeview(sr_am, settings_background, tv1))
     esti_hours_SRam.place(relheight=.1,relwidth=.25, relx=.01,rely=.78)
 
 
 
-    fresh_pm = esti_pm[esti_pm['Tot hrs'] < 290]
+    fresh_pm = esti_pm[esti_pm['Tot hrs'] < 290].sort_values(by=['Name'])
     esti_hours_FRpm = tk.Button(settings_background, text='Freshman PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(fresh_pm, settings_background, tv1))
     esti_hours_FRpm.place(relheight=.1,relwidth=.25, relx=.28,rely=.5)
 
-    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)]
+    jr_pm = esti_pm[(esti_pm['Tot hrs'] > 290) & (esti_pm['Tot hrs'] < 690)].sort_values(by=['Name'])
     esti_hours_JRpm = tk.Button(settings_background, text='Junior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(jr_pm, settings_background, tv1))
     esti_hours_JRpm.place(relheight=.1,relwidth=.25, relx=.28,rely=.64)
 
 
-    sr_pm = esti_pm[esti_pm['Tot hrs'] >= 690 ]
+    sr_pm = esti_pm[esti_pm['Tot hrs'] >= 690 ].sort_values(by=['Name'])
     esti_hours_SRpm = tk.Button(settings_background, text='Senior PM', bg='Maroon', fg='white', command= lambda: get_small_treeview(sr_pm, settings_background, tv1))
     esti_hours_SRpm.place(relheight=.1,relwidth=.25, relx=.28,rely=.78)
 
@@ -1089,7 +1094,8 @@ def fail_date_window():
     messagebox.showerror("Correct Dates Format", "Error Check Date Format is\nMM/DD/YY \nor\nMM/DD/YY - MM/DD/YY for two days") 
 def fail_hours_window():
     messagebox.showerror("Correct hours Format", "Error Check hour Format is\nH:MM am \nor\nH:MM pm ") 
-
+def fail_hours_mixup():
+    messagebox.showerror("Correct hours Format", "Error one or more of your clock in times is later than then clock out time")
 def clear(background):
     hours_menu(background)
 

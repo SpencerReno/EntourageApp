@@ -142,13 +142,59 @@ def unpaid_students(menu_background):
     title_label = tk.Label(settings_background, text = 'Unpaid Students', bg=main_color, fg='grey', font=('Times', '36','bold'))
     title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
 
+    date=get_update_date('ledger')
+    update_date_label = tk.Label(settings_background, text=f'Last updated: \n{str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
+    update_date_label.place(relx=.85, rely= .015)
 
-    data_frame = tk.LabelFrame(settings_background)
-    data_frame.place(rely=0.1, relx=0, relheight=.9,relwidth=1)
+
+
+    today = datetime.datetime.now().date().replace(day=1)
+    last_month = today- datetime.timedelta(days=40)
+    data['Last Payed Date'] = pd.to_datetime(data['Last Payed Date'])
+    data_last_30= data[data['Last Payed Date'].dt.month <= last_month.month]
+    data_last_30['Last Payed Date'] = data_last_30['Last Payed Date'].dt.normalize()
+    data_last_30 = data_last_30[['Student Id', 'Name', 'Balance', 'Last Payed Date', 'status']]
+    
+    last_30_days_button = tk.Button(settings_background, text=f'No Payment before {today.strftime("%B")}', bg='black',fg='white', font=('Times', '10','bold'), command= lambda: adjust_unpaid_treeview(settings_background, data_last_30, tv1))
+    last_30_days_button.place(relx=.1, rely=.9, relheight=.1, relwidth=.2)
+
+
+    all_students_button = tk.Button(settings_background, text='Show all', bg='black',fg='white', font=('Times', '10','bold'), command= lambda: adjust_unpaid_treeview(settings_background, data, tv1))
+    all_students_button.place(relx=.31, rely=.9, relheight=.1, relwidth=.2)
+
+    current = data[(data['status'] ==' Currently Attending' ) | ( data['status'].str.contains('Probation' )) | ( data['status'].str.contains('Leave of Absence' )) | ( data['status'].str.contains('Transferred' )) ]
+    currently_attend_button = tk.Button(settings_background, text='Currently Attending', bg='black',fg='white', font=('Times', '10','bold'), command= lambda: adjust_unpaid_treeview(settings_background, current, tv1))
+    currently_attend_button.place(relx=.1, rely=.77, relheight=.1, relwidth=.2)
+
+    loa_studnets = data[( data['status'].str.contains('Leave of Absence' ))]
+    loa_studnets_button = tk.Button(settings_background, text='Leave of Absence', bg='black',fg='white', font=('Times', '10','bold'), command= lambda: adjust_unpaid_treeview(settings_background, loa_studnets, tv1))
+    loa_studnets_button.place(relx=.31, rely=.77, relheight=.1, relwidth=.2)
+
+
+    dropped = data[data['status'].str.contains('Dropped' ) | ( data['status'].str.contains('No Start' )) ]
+    dropped_button = tk.Button(settings_background, text='Dropped', bg='black',fg='white', font=('Times', '10','bold'), command= lambda: adjust_unpaid_treeview(settings_background, dropped, tv1))
+    dropped_button.place(relx=.52, rely=.77, relheight=.1, relwidth=.2)
+
+    grad = data[data['status'].str.contains('Graduate' ) ]
+    delinquents_button = tk.Button(settings_background, text='Delinquent Graduates', bg='black',fg='white', font=('Times', '10','bold'), command= lambda: adjust_unpaid_treeview(settings_background, grad, tv1))
+    delinquents_button.place(relx=.73, rely=.77, relheight=.1, relwidth=.2)
+
+    
+
+
+    tv1 = unpaid_treeview(settings_background, data)
+    tv1.place(relheight=1, relwidth=1)
+
+
+def unpaid_treeview(background, data):
+    data['Last Payed Date'] = data['Last Payed Date'].dt.floor('D').dt.date
+
+    data_frame = tk.LabelFrame(background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
 
 
     tv1 = ttk.Treeview(data_frame)
-    tv1.place(relheight=1, relwidth=1)
+
 
     treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
     tv1.configure(yscrollcommand=treescrolly.set)
@@ -161,7 +207,12 @@ def unpaid_students(menu_background):
 
     for column in tv1['columns']:
         tv1.heading(column, text=column)
-        tv1.column(column, width=data_frame.winfo_width())
+    tv1.column(tv1['columns'][0], width=30, anchor='w')
+    tv1.column(tv1['columns'][1], width=120,  anchor='w')
+    tv1.column(tv1['columns'][2], width=40, anchor='center')
+    tv1.column(tv1['columns'][3], width=80,  anchor='center')
+    tv1.column(tv1['columns'][4], width=150, anchor='w')
+
 
     df_rows = data.to_numpy().tolist()
 
@@ -170,6 +221,19 @@ def unpaid_students(menu_background):
 
     tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
 
+    return tv1
+def adjust_unpaid_treeview(background, data, tree):
+    try:
+        data['Last Payed Date'] = data['Last Payed Date'].dt.floor('D').dt.date
+    except:
+        print('date is formated')
+
+
+    for item in tree.get_children():
+      tree.delete(item)
+    df_rows = data.to_numpy().tolist()
+    for row in df_rows:
+        tree.insert('', 'end', values=row)
 
 def reports_page(main_background):
     main_background.destroy()
@@ -965,12 +1029,15 @@ def send_hours(tree, course):
         info = requests.get(url).json()
 
         from_addr = 'eibehours@outlook.com'
-        to_addr = info['info']['HOURS_EMAIL']
+        to_addr = []
+        for email in info['info']['HOURS_EMAIL']:
+            to_addr.append(str(email))
+        print(to_addr)
         subject = 'Hours'
 
         msg = MIMEMultipart()
         msg['From'] = from_addr
-        msg['To'] = to_addr
+        msg['To'] = ", ".join(to_addr)
         msg['Subject'] = subject
         body = MIMEText(f'New {course} hours!', 'plain')
 
@@ -997,7 +1064,7 @@ def send_hours(tree, course):
         server.starttls()
         server.ehlo()
         server.login(from_addr, 'coldL!ght65#')
-        server.send_message(msg, from_addr=from_addr,to_addrs=[to_addr])
+        server.sendmail(from_addr, to_addr, msg.as_string())
         server.quit()
         success_window()
 
@@ -1005,14 +1072,18 @@ def send_hours(tree, course):
         fail_date_window()
     elif send_clause == SyntaxError:
         fail_hours_window()
-
-
+    elif send_clause == SyntaxWarning:
+        fail_hours_mixup()
 
 
 def student_explode_view(data, practicaltotals,practical_data, test_data, date, course, background):
     background.destroy()
     student_background=tk.Label(blank_background, bg=main_color)
     student_background.place(relheight=1, relwidth=1)
+    
+    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_student_explode(student_background, course))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
     name_data = data.reset_index()
     
 
@@ -1074,11 +1145,6 @@ def student_explode_view(data, practicaltotals,practical_data, test_data, date, 
     update_date_label.place(relx=.85, rely= .02)
 
 
-
-
-
-    back_button = tk.Button(student_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_student_explode(student_background, course))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
 
     practical_tv = student_academics_view(practical_data,student_background ,rely=0.15, relx=0.45, relheight=.85,relwidth=.55)
     practical_tv.place(relheight=1, relwidth=1)
@@ -1462,7 +1528,8 @@ def fail_date_window():
     messagebox.showerror("Correct Dates Format", "Error Check Date Format is\nMM/DD/YY \nor\nMM/DD/YY - MM/DD/YY for two days") 
 def fail_hours_window():
     messagebox.showerror("Correct hours Format", "Error Check hour Format is\nH:MM am \nor\nH:MM pm ") 
-
+def fail_hours_mixup():
+    messagebox.showerror("Correct hours Format", "Error one or more of your clock in times is later than then clock out time")
 
 
 def get_user_file(background):

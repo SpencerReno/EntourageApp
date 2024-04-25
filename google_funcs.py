@@ -67,73 +67,29 @@ def get_student_status(course):
 
 def get_unpaid_students():
     url ='https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/ledger.csv'
-    data = pd.read_csv(url)  
-    student_column = data.columns[8]
-    student_ids_column =data.columns[5]
-    data.rename(columns={data.columns[4]: 'Dates'}, inplace=True)
+    data = pd.read_csv(url, header=None)  
+    data = data[[data.columns[4], data.columns[5], data.columns[6], data.columns[8], data.columns[13]]]
 
-    new_df = pd.DataFrame(columns=['Student Id', 'Name', 'Balance', 'Last Payed Date'] )
+    data_test = data[data[data.columns[2]].str.contains('Student Status')].reset_index()
+    balance =[]
+    for x in data_test['index'][1:]:
+        balance.append(data.iloc[x-1][data.columns[3]])
 
+    balance.append(data.iloc[-1][data.columns[3]])
+    last_date =[]
+    for y in data_test['index'][1:]:
+        last_date.append(data.iloc[y-1][data.columns[0]])
 
-    data[data.columns[8]]=data[student_column].str.replace(r"\(.", "", regex=True)
-    data[data[data.columns[8]].str.contains('\(')]
+    last_date.append(data.iloc[-1][data.columns[0]])
 
-    data = data[[data.columns[4], data.columns[5], data.columns[8],
-        data.columns[13]]]
-
-    student_names = [student_column]
-    student_ids = [student_ids_column]
-    multiplyer = []
-    data.rename(columns={student_column: 'Balance'}, inplace=True)
-    for x in range(len(data)):
-        try:
-            data['Balance'][x] = int(data['Balance'][x])
-        except:
-            student_names.append(data['Balance'][x])
-            student_ids.append(data[data.columns[1]][x])
-            multiplyer.append(x)
-
-    
-    multiplyer.append(len(data))
-
-    new_multi = [(multiplyer[i+1]-multiplyer[i]) -1 for i in range(len(multiplyer)-1)]
-    new_multi.insert(0, multiplyer[0])
-    balanceValues = []
-    dateValues = []
-    for x in range(len(data)):
-        if type(data['Balance'][x]) == int:
-            balanceValues.append(f"${data['Balance'][x]}")
-        if data['Dates'][x] != 'Student ID:':
-            dateValues.append(data['Dates'][x])
-
-
-    fixed_student_ids = []
-    for x in range(len(student_ids)):
-        for num in range(new_multi[x]):
-            fixed_student_ids.append(student_ids[x])
-
-    student_names_col = []
-    for x in range(len(student_names)):
-        for num in range(new_multi[x]):
-            student_names_col.append(student_names[x])
-
-
-    
-    new_df['Student Id'] = fixed_student_ids
-    new_df['Name'] = student_names_col
-    new_df['Balance'] = balanceValues
-    new_df['Last Payed Date'] =dateValues 
-
-    new_df['Last Payed Date'] = pd.to_datetime(new_df['Last Payed Date'])
-    new_df['Last Payed Date'] = new_df['Last Payed Date'].dt.normalize()
-    new_df['Last Payed Date'] = new_df['Last Payed Date'].dt.floor('D')
-
-    new_df= new_df.drop_duplicates(['Name'], keep='last')
-    res = calendar.monthrange(datetime.datetime.now().year, datetime.datetime.now().month)
-    startdate = f'{datetime.datetime.now().year}-{datetime.datetime.now().month}-1'
-    Final_df = new_df[(new_df['Last Payed Date'] < startdate)]
-    Final_df['Last Payed Date'] = pd.to_datetime(Final_df['Last Payed Date']).dt.date
-    return Final_df
+    data_test['Balance'] = balance
+    data_test['Last Payed Date'] = last_date
+    data_test
+    data = data_test[[5,8,'Balance','Last Payed Date', 6]]
+    data.rename(columns={5:'Student Id', 8:'Name', 6: 'status'}, inplace=True)
+    data['status'] =data['status'].str.split(':').str[1]
+    print(data['status'].unique())
+    return data
 
 def course_100_file(course):
     url  = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/CSV%20Files/EntourageApp.csv'
@@ -244,7 +200,7 @@ def esti_online_hours():
             data['clock out'] =  '9:30 pm'
         
         if data['Tot hrs'].iloc[0] >= 690:
-            data['clock in'] =  '5:30 pm'
+            data['clock in'] =  '4:30 pm'
             data['clock out'] =  '9:30 pm'
             
 
@@ -415,10 +371,10 @@ def get_download_clock_file(df):
                 outtime = df['clock out'].iloc[x][:4].strip(' ')
                 out_condition = df['clock out'].iloc[x][4:].strip(' ')
                 print(intime, in_condition, outtime, out_condition)
-                if  'am' not in in_condition or  'pm' not in in_condition:
+                if in_condition.lower()  != 'am' and in_condition.lower() != 'pm':
                     raise SyntaxError
             
-                if  'am' not in out_condition  or  'am' not in out_condition:
+                if  out_condition.lower()  !='am'   and out_condition.lower()  != 'pm':
                     raise SyntaxError
                 print('here')
                 in_time_hour = intime.split(':')[0]
@@ -428,6 +384,9 @@ def get_download_clock_file(df):
                 out_time_hour = outtime.split(':')[0]    
                 if len(out_time_hour) < 2 and 'am' in out_condition:
                     out_time_hour =f'0{out_time_hour}'
+
+                if in_time_hour > out_time_hour:
+                    raise SyntaxWarning
 
                 if 'pm' in out_condition:
                     out_time_hour = str(int(out_time_hour )+ 12)
@@ -456,6 +415,12 @@ def get_download_clock_file(df):
         send_clause= ValueError
         return clocked_hours, send_clause
     except SyntaxError:
+        send_clause = SyntaxError
+        return clocked_hours, send_clause
+    except SyntaxWarning:
+        send_clause = SyntaxWarning
+        return clocked_hours, send_clause
+    except IndexError:
         send_clause = SyntaxError
         return clocked_hours, send_clause
     
@@ -739,6 +704,11 @@ def get_update_date(item):
         if commits.totalCount:
             date = commits[0].commit.committer.date
 
+    elif item =='ledger':
+        commits = repo.get_commits(path='CSV Files/ledger.csv')
+        if commits.totalCount:
+            date = commits[0].commit.committer.date
+            
     date = date.strftime("%m/%d/%Y")
     return date
     
