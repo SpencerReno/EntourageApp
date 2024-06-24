@@ -26,6 +26,7 @@ import base64
 from github import Github
 import datetime
 from datetime import datetime
+import threading
 
 
 
@@ -103,47 +104,119 @@ def show_menu():
 
 
     directors_ed = tk.Label(main_background, text="DIRECTORS EDITION", bg=main_color, fg='grey', font=('Times', '36','bold'))
-    directors_ed.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
+    directors_ed.place(relx=.12, rely=.01, relheight=.15, relwidth=.8)
 
-    entourage_logo = tk.Label(main_background, width=w, height=h,image=EN_photo,bg=main_color)
-    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
+    ##Main VIEW_BOX
+    view_box = tk.LabelFrame(main_background, bg=main_color, borderwidth=2)
+    view_box.place(relx=.25, rely=.2, relheight=.78, relwidth=.73)
+
+    entourage_logo = tk.Label(view_box, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.1, rely=.3, relheight=.4, relwidth=.8)
 
 
-    payment_totals = tk.Button(main_background, text='Daily Totals', bg='black', fg='white', command=lambda: reports_page(main_background))
-    payment_totals.place(relheight=.1,relwidth=.25, relx=.23,rely=.55)
+    payment_totals = tk.Button(main_background, text='Daily Totals', bg='black', fg='white', command=lambda : reports_page(view_box, entourage_logo.destroy()))
+    payment_totals.place(relheight=.1,relwidth=.25, relx=.001,rely=.209)
 
     hours_creator = tk.Button(main_background, text='Hours Creator', bg='black', fg='white', command=lambda: hours_menu(main_background))
-    hours_creator.place(relheight=.1,relwidth=.25, relx=.52,rely=.55)
+    hours_creator.place(relheight=.1,relwidth=.25, relx=.001,rely=.319)
 
     final_100 = tk.Button(main_background, text='Final 100', bg='black', fg='white', command=lambda: final_100_page(main_background))
-    final_100.place(relheight=.1,relwidth=.25, relx=.23,rely=.68)
+    final_100.place(relheight=.1,relwidth=.25, relx=.001,rely=.429)
 
     unpaid = tk.Button(main_background, text='Unpaid Students', bg='black', fg='white', command=lambda: unpaid_students(main_background))
-    unpaid.place(relheight=.1,relwidth=.25, relx=.52,rely=.68)
+    unpaid.place(relheight=.1,relwidth=.25, relx=.001,rely=.539)
 
     status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
-    status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
+    status_button.place(relheight=.1,relwidth=.25, relx=.001,rely=.649)
 
     update_button = tk.Button(main_background, text='Update App', bg='black', fg='white', command=lambda: get_user_file(main_background))
-    update_button.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
+    update_button.place(relheight=.1,relwidth=.25, relx=.001,rely=.759)
 
-    unsubmitted_button = tk.Button(main_background, text='Unsubmitted', bg='black', fg='white', command=lambda: unsubmitted_hours(main_background))
-    unsubmitted_button.place(relheight=.1,relwidth=.25, relx=.02,rely=.8)
+    unsubmitted_button = tk.Button(main_background, text='Unsubmitted', bg='black', fg='white', command= lambda: unsubmitted_hours(main_background))
+    unsubmitted_button.place(relheight=.1,relwidth=.25, relx=.001,rely=.869)
 
     root.mainloop()
 
+
+def reports_page(reports_background,event):
+    # main_background.destroy()
+    # reports_background =tk.Label(blank_background, bg=main_color)
+    # reports_background.place(relheight=1, relwidth=1)
+
+    daily_totals_title= tk.Label(reports_background, text="DAILY TOTALS", bg=main_color, fg='grey', font=('Times', '26','bold'))
+    daily_totals_title.place(relx=.15, rely=-.02, relheight=.15, relwidth=.8)
+
+    totals_entry = tk.Text(reports_background, font=('Times', '11','bold'))
+    totals_entry.place(rely=0.1, relx=0, relheight=1,relwidth=.55)
+
+
+    total_label = tk.Label(reports_background, text="TOTAL", bg=main_color, fg='grey', font=('Times', '24','bold'))
+    total_label.place(relheight=.1,relwidth=.25, relx=.65,rely=.35)
+
+
+    total_display= tk.Entry(reports_background,bg=main_color, fg='lightgreen', font=('Times', '24','bold'))
+    total_display.place(relheight=.1,relwidth=.25, relx=.65,rely=.5)
+    
+
+    submit_button= tk.Button(reports_background, text='Submit', bg='black', fg='white', command=lambda: add_totals(totals_entry, total_display))
+    submit_button.place(relheight=.1,relwidth=.25, relx=.65,rely=.7)
+
+
+
+
+    back_button = tk.Button(reports_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(reports_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+
+def add_totals(text, total_display):
+    lst = text.get("1.0",'end-1c')
+    lst = lst.split('\n')
+    nums = []
+
+    import re
+    total = 0
+    for line in lst:
+        line= line.replace(',', '')
+        res = re.findall(r'\d+', line)
+        if len(res) >=1:
+            final = '.'.join(res)
+            nums.append(float(final))
+
+
+    for num in nums:
+        total = total + float(num)
+
+    print(total)
+
+    total= str(total)
+    split_total = total.split('.')
+    print(split_total)
+    if len(split_total[1]) >2:
+        total = f'{split_total[0]}.{split_total[1][:2]}'
+    else:
+        total = total
+
+
+    print(total)
+    total_display.delete(0, tk.END)
+    total_display.insert(0,total)
+
+
+
+
 def unsubmitted_hours(background):
-    background.destroy()
     massage_am, cos_am, cos_pm, nails_pm, esti_fr_am, esti_fr_pm, esti_jr_am, esti_jr_pm, esti_sr_am, esti_sr_pm= unsubmit_page_info()
     print('massage: ' , massage_am, '\n' , 'cos am: ', cos_am, '\n', 'cos pm: ', cos_pm, '\n', 'nails pm: ', nails_pm, '\n', 'esti am: ', esti_fr_am, '\n', 'esti fr pm: ', esti_fr_pm, '\n', 'esti jr am: ', esti_jr_am, '\n', 'esti jr pm: ', esti_jr_pm, '\n', 'esti sr am: ', esti_sr_am, '\n', 'esti sr pm: ', esti_sr_pm)
+    background.destroy()
     unsubmitted_background =tk.Label(blank_background, bg=main_color)
     unsubmitted_background.place(relheight=1, relwidth=1)
     back_button = tk.Button(unsubmitted_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(unsubmitted_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)   
 
+    Unsubmitted_page_title = tk.Label(unsubmitted_background, text='UNSUBMITTED ONLINE WORK', bg=main_color, fg='grey', font=('Times', '28','bold'))
+    Unsubmitted_page_title.place(relx=.13, rely=.01, relheight=.1, relwidth=.85)
 
-
-    cos_title_label = tk.Label(unsubmitted_background, text='COSMETOLOGY', font=('Times', '14','bold'))
+    cos_title_label = tk.Label(unsubmitted_background, text='COSMETOLOGY',bg=main_color, fg='grey', font=('Times', '14','bold'))
     cos_title_label.place(relx=.16, rely=.14)
 
     cos_unsubmitted_label = tk.Label(unsubmitted_background, bg='white')
@@ -158,24 +231,30 @@ def unsubmitted_hours(background):
     cos_pm_title = tk.Label(cos_unsubmitted_label, text='COS PM', font=('Times', '11','bold') )
     cos_pm_title.place(relx=.65, rely= .05)
     cos_pm_date_missed = tk.Label(cos_unsubmitted_label, font=('Times', '9','bold'))
-    cos_pm_date_missed.place(relx=.65, rely= .3)
+    cos_pm_date_missed.place(relx=.63, rely= .3)
     cos_pm_date_missed.config(text=f'{cos_pm[0]}')
 
-    nails_title_label = tk.Label(unsubmitted_background, text='NAIL TECHNOLOGY', font=('Times', '14','bold'))
+    nails_title_label = tk.Label(unsubmitted_background, text='NAIL TECHNOLOGY',bg=main_color, fg='grey', font=('Times', '14','bold'))
     nails_title_label.place(relx=.14, rely=.42)
-
+    
     nails_unsubmitted_label = tk.Label(unsubmitted_background, bg='white')
     nails_unsubmitted_label.place(relx=.03, rely=.48, relheight=.2, relwidth=.45)
 
     nails_am_title = tk.Label(nails_unsubmitted_label, text='Nails AM', font=('Times', '11','bold') )
     nails_am_title.place(relx=.1, rely= .05)
+    nails_am_date_missed = tk.Label(nails_unsubmitted_label, font=('Times', '9','bold'))
+    nails_am_date_missed.place(relx=.08, rely= .3)
+    #nails_am_date_missed.config(text=f'{nails_am[0]}')
 
     nails_pm_title = tk.Label(nails_unsubmitted_label, text='Nails PM', font=('Times', '11','bold') )
     nails_pm_title.place(relx=.65, rely= .05)
+    nails_pm_date_missed = tk.Label(nails_unsubmitted_label, font=('Times', '9','bold'))
+    nails_pm_date_missed.place(relx=.63, rely= .3)
+    nails_pm_date_missed.config(text=f'{nails_pm[0]}')
 
 
 
-    massage_title_label = tk.Label(unsubmitted_background, text='MASSAGE', font=('Times', '14','bold'))
+    massage_title_label = tk.Label(unsubmitted_background, text='MASSAGE',bg=main_color, fg='grey', font=('Times', '14','bold'))
     massage_title_label.place(relx=.20, rely=.7)
 
     massage_unsubmitted_label = tk.Label(unsubmitted_background, bg='white')
@@ -183,29 +262,35 @@ def unsubmitted_hours(background):
 
     massage_am_title = tk.Label(massage_unsubmitted_label, text='Massage AM', font=('Times', '11','bold') )
     massage_am_title.place(relx=.06, rely= .05)
+    massage_am_date_missed = tk.Label(massage_unsubmitted_label, font=('Times', '9','bold'))
+    massage_am_date_missed.place(relx=.08, rely= .3)
+    massage_am_date_missed.config(text=f'{massage_am[0]}')
 
     massage_pm_title = tk.Label(massage_unsubmitted_label, text='Massage PM', font=('Times', '11','bold') )
-    massage_pm_title.place(relx=.6, rely= .05)
+    massage_pm_title.place(relx=.65, rely= .05)
+    massage_pm_date_missed = tk.Label(massage_unsubmitted_label, font=('Times', '9','bold'))
+    massage_pm_date_missed.place(relx=.63, rely= .3)
+    massage_pm_date_missed.config(text=f'Coming Soon')
 
 
-    esti_title_label = tk.Label(unsubmitted_background, text='ESTHETICS', font=('Times', '14','bold'))
+    esti_title_label = tk.Label(unsubmitted_background, text='ESTHETICS',bg=main_color, fg='grey', font=('Times', '14','bold'))
     esti_title_label.place(relx=.7, rely=.14)
 
     esti_unsubmitted_label = tk.Label(unsubmitted_background, bg='white')
     esti_unsubmitted_label.place(relx=.53, rely=.2, relheight=.76, relwidth=.46)
 
     esti_fram_title = tk.Label(esti_unsubmitted_label, text='Freshman AM', font=('Times', '11','bold') )
-    esti_fram_title.place(relx=.1, rely= .05)
+    esti_fram_title.place(relx=.08, rely= .05)
     #missing date under the course label 
     esti_fram_date_missed = tk.Label(esti_unsubmitted_label, font=('Times', '9','bold'))
-    esti_fram_date_missed.place(relx=.08, rely= .15)
+    esti_fram_date_missed.place(relx=.12, rely= .12)
     esti_fram_date_missed.config(text=f'{esti_fr_am[0]}')
 
     esti_frpm_title = tk.Label(esti_unsubmitted_label, text='Freshman PM', font=('Times', '11','bold') )
-    esti_frpm_title.place(relx=.65, rely= .05)
+    esti_frpm_title.place(relx=.63, rely= .05)
     #missing date under the course label 
     esti_frpm_date_missed = tk.Label(esti_unsubmitted_label, font=('Times', '9','bold'))
-    esti_frpm_date_missed.place(relx=.63, rely= .15)
+    esti_frpm_date_missed.place(relx=.65, rely= .12)
     esti_frpm_date_missed.config(text=f'{esti_fr_pm[0]}')
 
 
@@ -227,14 +312,14 @@ def unsubmitted_hours(background):
     esti_sram_title.place(relx=.1, rely= .75)
     #missing date
     esti_sram_date_missed = tk.Label(esti_unsubmitted_label, font=('Times', '9','bold'))
-    esti_sram_date_missed.place(relx=.08, rely= .85)
+    esti_sram_date_missed.place(relx=.08, rely= .82)
     esti_sram_date_missed.config(text=f'{esti_sr_am[0]}')
 
     esti_srpm_title = tk.Label(esti_unsubmitted_label, text='Senior PM', font=('Times', '11','bold') )
     esti_srpm_title.place(relx=.65, rely= .75)
     #missing date
     esti_srpm_date_missed = tk.Label(esti_unsubmitted_label, font=('Times', '9','bold'))
-    esti_srpm_date_missed.place(relx=.63, rely= .85)
+    esti_srpm_date_missed.place(relx=.67, rely= .82)
     esti_srpm_date_missed.config(text=f'{esti_sr_pm[0]}')
 
 
@@ -345,70 +430,6 @@ def adjust_unpaid_treeview(background, data, tree):
     df_rows = data.to_numpy().tolist()
     for row in df_rows:
         tree.insert('', 'end', values=row)
-
-def reports_page(main_background):
-    main_background.destroy()
-    reports_background =tk.Label(blank_background, bg=main_color)
-    reports_background.place(relheight=1, relwidth=1)
-
-
-    daily_totals_title= tk.Label(reports_background, text="DAILY TOTALS", bg=main_color, fg='grey', font=('Times', '36','bold'))
-    daily_totals_title.place(relx=.15, rely=-.02, relheight=.15, relwidth=.8)
-
-    totals_entry = tk.Text(reports_background,)
-    totals_entry.place(rely=0.1, relx=0, relheight=1,relwidth=.55)
-
-
-    total_label = tk.Label(reports_background, text="TOTAL", bg=main_color, fg='grey', font=('Times', '36','bold'))
-    total_label.place(relheight=.1,relwidth=.25, relx=.65,rely=.35)
-
-
-    total_display= tk.Entry(reports_background,bg=main_color, fg='lightgreen', font=('Times', '28','bold'))
-    total_display.place(relheight=.1,relwidth=.25, relx=.65,rely=.5)
-    
-
-    submit_button= tk.Button(reports_background, text='Submit', bg='black', fg='white', command=lambda: add_totals(totals_entry, total_display))
-    submit_button.place(relheight=.1,relwidth=.25, relx=.65,rely=.7)
-
-
-
-
-    back_button = tk.Button(reports_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(reports_background))
-    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
-
-
-def add_totals(text, total_display):
-    lst = text.get("1.0",'end-1c')
-    lst = lst.split('\n')
-    nums = []
-
-    import re
-    total = 0
-    for line in lst:
-        line= line.replace(',', '')
-        res = re.findall(r'\d+', line)
-        if len(res) >=1:
-            final = '.'.join(res)
-            nums.append(float(final))
-
-
-    for num in nums:
-        total = total + float(num)
-
-    print(total)
-
-    total= str(total)
-    split_total = total.split('.')
-    print(split_total)
-    if len(split_total[1]) >2:
-        total = f'{split_total[0]}.{split_total[1][:2]}'
-    else:
-        total = total
-
-
-    print(total)
-    total_display.delete(0, tk.END)
-    total_display.insert(0,total)
 
 
 
