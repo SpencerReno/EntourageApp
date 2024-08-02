@@ -17,6 +17,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from dateutil import parser
+import os.path
+from datetime import datetime
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 
 def adding(text):
@@ -332,37 +339,37 @@ def get_download_clock_file(df):
             else:
                 if '-' not in string:
                     if len(string) <= 8:
-                        print(string)
                         if int(string.split('/')[0])>=1 and int(string.split('/')[0])<13:
-                            if int(string.split('/')[1])>=1 and int(string.split('/')[1])<31:
+                            if int(string.split('/')[1])>=1 and int(string.split('/')[1])<=31:
                                     date_list.append(parser.parse(string))
                                     send_clause = True
 
-            for date in date_list:
-                month = date.month
+            for date_x in date_list:
+                month = date_x.month
                 if len(str(month)) == 1:
                     month = f'0{str(month)}'
 
-                day = date.day
+                day = date_x.day
                 if len(str(day)) == 1:
                     day = f'0{str(day)}'
 
 
-                year_test = int(str(date.year)[-2:])
+                year_test = int(str(date_x.year)[-2:])
 
-
+            
                 #Check if the year entered is == to last year   
-                if year_test == int(str(datetime.date.today().year)[-2:]) - 1:
+                from datetime import date
+                if year_test == int(str(date.today().year)[-2:]) - 1:
                     year= year_test
                 #Check if the year entered is == to next year   
-                elif year_test == int(str(datetime.date.today().year)[-2:]) +1:
+                elif year_test == int(str(date.today().year)[-2:]) +1:
                     year = year_test
                 #Check if the year entered is == to current year    
-                elif year_test == int(str(datetime.date.today().year)[-2:]):
+                elif year_test == int(str(date.today().year)[-2:]):
                     year = year_test
 
                 else:
-                    year = int(str(datetime.date.today().year)[-2:])
+                    year = int(str(date.today().year)[-2:])
 
 
            ## FIX ERROR HERE !!!!!!!
@@ -376,7 +383,7 @@ def get_download_clock_file(df):
             
                 if  out_condition.lower()  !='am'   and out_condition.lower()  != 'pm':
                     raise SyntaxError
-                print('here')
+                
                 in_time_hour = intime.split(':')[0]
                 if len(in_time_hour) < 2 and 'am' in in_condition:
                     in_time_hour =f'0{in_time_hour}'
@@ -393,7 +400,6 @@ def get_download_clock_file(df):
                 
                 if 'pm' in in_condition:
                     in_time_hour = str(int(in_time_hour )+ 12)
-
 
                 clock_in = {
                     0 : 'PN00',
@@ -711,4 +717,168 @@ def get_update_date(item):
             
     date = date.strftime("%m/%d/%Y")
     return date
+
+def refresh_google():
+    SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
+    creds = None
+    if os.path.exists("token.json"):
+         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+    return creds
+        
+
+
+
+def massage_last_subital():
+    creds = refresh_google()
+    try:
+        folder_id='15-aqS6s0fyTxCI8qva9Y0p4oXeeaIeFe'
+        service = build("drive", "v3", credentials=creds)
+
+        # first call for recent year folder 
+        results = (
+            service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"parents in '{folder_id}' and trashed = false", fields = "nextPageToken, files(id, name)").execute() )
+        items = results.get("files", [])
+
+        if not items:
+            return 'No Files found'
+
+
+    #gets most recent Year folder
+        recent_year_folder_id = str(items[0]['id'])
+        service = build("drive", "v3", credentials=creds)
+        results = (
+            service.files()
+        
+            .list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"parents in '{recent_year_folder_id}' and trashed = false", fields = "nextPageToken, files(id, name)")
+            .execute()
+        )
+        items = results.get("files", [])
+
+        most_recent_file = items[0]['name']
+        most_recent_file=most_recent_file.split('.')[0]
+        datetime_object = datetime.strptime(most_recent_file,'%m/%d/%y')
+        start, end = datetime_object, datetime.now()
+        missing_dates = [str(d).split(' ')[0] for d in pd.date_range(start, end) if d.weekday() == 2]
+        #dont include 1st date as that is the starting point from the last submition 
+        missing_dates = missing_dates[1:]
+
+
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
     
+    
+    return missing_dates
+
+
+def cos_last_subital(course):
+    creds = refresh_google()
+    course_type = course
+    try:
+        if course_type == 'am': 
+            folder_id='1s80kHVRny8A4IpKQo8-9cS1-nmkP3ZkX'
+        if course_type =='pm':
+            folder_id='1alOony4AAbHpktMqpg1qhQOOZMmFGdhR'
+        service = build("drive", "v3", credentials=creds)
+
+        # first call for recent year folder 
+        results = (
+            service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"parents in '{folder_id}' and trashed = false", fields = "nextPageToken, files(id, name)").execute() )
+        items = results.get("files", [])
+
+        if not items:
+            return 'No Files found'
+
+
+    #gets most recent Year folder
+        recent_year_folder_id = str(items[0]['id'])
+        service = build("drive", "v3", credentials=creds)
+        results = (
+            service.files()
+        
+            .list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"parents in '{recent_year_folder_id}' and trashed = false", fields = "nextPageToken, files(id, name)")
+            .execute()
+        )
+        items = results.get("files", [])
+
+        most_recent_file = items[0]['name']
+        most_recent_file=most_recent_file.split('.')[0]
+        datetime_object = datetime.strptime(most_recent_file,'%m/%d/%y')
+        start, end = datetime_object, datetime.now()
+        missing_dates = [str(d).split(' ')[0] for d in pd.date_range(start, end) if d.weekday() == 2]
+        #dont include 1st date as that is the starting point from the last submition 
+        missing_dates = missing_dates[1:]
+
+
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+    
+    
+    return missing_dates
+
+def nails_last_subital():
+    return 'Test'
+
+def esti_last_subital():
+    return 'Test'
+
+
+def unsubmit_page_info():
+    creds = refresh_google()
+    cos_am='1s80kHVRny8A4IpKQo8-9cS1-nmkP3ZkX'
+    cos_pm='1alOony4AAbHpktMqpg1qhQOOZMmFGdhR'
+    nails_am='1-l-Wb1sCyApJXkF1_-6Bha9xsc_L_8TC'
+    nails_pm='1wgdHXkbk7vKjLypBFnKol2SH6jUG9oSl'
+    massage_am='15-aqS6s0fyTxCI8qva9Y0p4oXeeaIeFe'
+    massage_pm = None
+    esti_fresh_am='1AVBJ9AjZyujkxWLQcpWKwNpm-2H6F_be'
+    esti_fresh_pm='1eEnVN-hz39ykox1yPHdgCksZDc8XpQJW'
+    esti_jr_am='1apiHkKHca809_zkGOwnS3Eb10cE8-27w'
+    esti_jr_pm='1yTbLF4V7o5cpRSd7SIX9zHCcPVgrbkKb'
+    esti_sr_am='1Eb5sCYy9TgFviititCzud9IvUntPEkMT'
+    esti_sr_pm='1Gx9Z09iFrKMOi-EZPoqvndmKbExscYP-'
+
+    return missing_dates(massage_am, creds, 2),missing_dates(cos_am, creds, 0),missing_dates(cos_pm, creds, 0), missing_dates(nails_pm, creds, 0), missing_dates(esti_fresh_am, creds, 3), missing_dates(esti_fresh_pm, creds, 3), missing_dates(esti_jr_am,creds, 0), missing_dates(esti_jr_pm, creds, 0), missing_dates(esti_sr_am, creds, 2), missing_dates(esti_sr_pm, creds, 2)
+
+
+
+def missing_dates(folder_id, creds, weekdays):
+    service = build("drive", "v3", credentials=creds)
+
+    # first call for recent year folder 
+    results = (
+        service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"parents in '{folder_id}' and trashed = false", fields = "nextPageToken, files(id, name)").execute() )
+    items = results.get("files", [])
+    for x in range(len(items)):
+        if items[x]['name'] == str(datetime.now().year):
+            recent_year_folder_id = str(items[x]['id'])
+    if not items:
+        return 'No Files found'
+
+
+#gets most recent Year folder
+
+    service = build("drive", "v3", credentials=creds)
+    results = (
+        service.files()
+    
+        .list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"parents in '{recent_year_folder_id}' and trashed = false", fields = "nextPageToken, files(id, name)")
+        .execute()
+    )
+    items = results.get("files", [])
+    most_recent_file = items[0]['name']    
+    most_recent_file=most_recent_file.split('.')[0]
+    if '-' in most_recent_file:
+        most_recent_file= most_recent_file.split('-')[0].strip(' ')
+    datetime_object = datetime.strptime(most_recent_file,'%m/%d/%y')
+    start, end = datetime_object, datetime.now()
+    missing_dates = [str(d.strftime('%m/%d/%Y')).split(' ')[0] for d in pd.date_range(start, end) if (d.weekday() == weekdays) & (d != start)]
+    #dont include 1st date as that is the starting point from the last submition 
+    if len(missing_dates)<=0:
+        return ["All Submitted"]
+    else:
+        return missing_dates
