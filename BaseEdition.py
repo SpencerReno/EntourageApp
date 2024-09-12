@@ -35,7 +35,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-
+VERSION = '1.0.1'
 main_color = '#313942'
 
 root = tk.Tk()
@@ -54,10 +54,10 @@ settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 
 
 # def update_check():
-#     print('checking for updates')
-#     root.geometry('300x300')
+#     root.geometry("700x500")
 #     main_background =tk.Label(blank_background, bg=main_color)
 #     main_background.place(relheight=1, relwidth=1)
+
 #     update_label = tk.Label(main_background, text='Checking for updates...', bg=main_color, fg='gray',font=('Times', '15','bold'))
 #     update_label.place(relx=.11, rely=.3, relheight=.15, relwidth=.8)
 
@@ -65,52 +65,22 @@ settings_photo = tk.PhotoImage(file='assets\\settingsWheel.png')
 #     info = requests.get(url).json()
 #     server_app_version = info['info']['APP_VERSION']
 
+#     print(server_app_version)
+#     if str(server_app_version) != str(VERSION):
+#         update_label.config(text='Getting Updates...')
+#         filename = os.path.basename(sys.argv[0])
+#         for file in os.listdir():
+#                     if file == filename: #Does not delete itself
+#                         pass
 
-#     local_info=open(os.path.join(os.path.dirname(sys.argv[0]), 'app_info.json'))
-#     local_info = json.load(local_info)
-#     local_app_version =local_info['info']['APP_VERSION']
+#                     else:
+#                         os.remove(file)
 
-#     if server_app_version != local_app_version:
-#         update_label.config(text='UPDATE REQUIRED!!')
-#         update_button = tk.Button(main_background, text='Update', bg='black', fg='white', command= lambda: update_app())
-#         update_button.place(relheight=.1,relwidth=.25, relx=.35,rely=.6)
+#         exename = 'EntourageApp.exe'
+#         code= requests.get()    
 
-
-#     else:
-#         update_label.after(2000, show_menu)
-#     root.mainloop()
-
-# def update_app():
-#     url = 'https://github.com/SpencerReno/EntourageApp/raw/main/EntourageDirectors.exe'
-
-#     print('File Downloading')
-
-#     usrname = getpass.getuser()
-#     destination = f'C:\\Users\\{usrname}\\Downloads\\EntourageApp.exe'
-
-#     download = urlretrieve(url, destination)
-
-#     print('File downloaded')
-#     delete_old()
-#     install_new()
-
-# def delete_old():
-#     try:
-#         cmd = f'C:\\Program Files (x86)\\EntourageDirectors\\unins000.exe'
-
-#         returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-#         print('returned value:', returned_value)
-
-#         install_new()
-#     except:
-#         install_new()
-# def install_new():
-#     usrname = getpass.getuser()
-
-#     cmd = f'C:\\Users\\{usrname}\\Downloads  EntourageApp.exe'
-
-#     returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-#     print('returned value:', returned_value)
+#     elif str(server_app_version) == str(VERSION):
+#         show_menu()
 
 
 
@@ -118,7 +88,6 @@ def show_menu():
     root.geometry("700x500")
     main_background =tk.Label(blank_background, bg=main_color)
     main_background.place(relheight=1, relwidth=1)
-
 
     directors_ed = tk.Label(main_background, text="INSTRUCTORS EDITION", bg=main_color, fg='gray', font=('Times', '36','bold'))
     directors_ed.place(relx=.07, rely=.05, relheight=.15, relwidth=.9)

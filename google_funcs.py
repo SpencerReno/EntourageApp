@@ -3,8 +3,7 @@ import requests
 from io import StringIO
 from tkinter.filedialog import asksaveasfile
 import re
-from datetime import date
-import datetime
+from datetime import date, datetime
 import calendar
 import numpy as np 
 import smtplib
@@ -333,32 +332,32 @@ def get_download_clock_file(df):
                 if '-' in string:
                     if len(string.split('-')) <=2:
                         for y in range(len(string.split('-'))):
-                            date = parser.parse(string.split('-')[y])
-                            date_list.append(date)
+                            date_ = parser.parse(string.split('-')[y])
+                            date_list.append(date_)
                         send_clause = True
             else:
                 if '-' not in string:
                     if len(string) <= 8:
+                        print(string)
                         if int(string.split('/')[0])>=1 and int(string.split('/')[0])<13:
                             if int(string.split('/')[1])>=1 and int(string.split('/')[1])<=31:
                                     date_list.append(parser.parse(string))
                                     send_clause = True
 
-            for date_x in date_list:
-                month = date_x.month
+            for date_ in date_list:
+                month = date_.month
                 if len(str(month)) == 1:
                     month = f'0{str(month)}'
 
-                day = date_x.day
+                day = date_.day
                 if len(str(day)) == 1:
                     day = f'0{str(day)}'
 
 
-                year_test = int(str(date_x.year)[-2:])
+                year_test = int(str(date_.year)[-2:])
 
-            
+
                 #Check if the year entered is == to last year   
-                from datetime import date
                 if year_test == int(str(date.today().year)[-2:]) - 1:
                     year= year_test
                 #Check if the year entered is == to next year   
@@ -383,7 +382,7 @@ def get_download_clock_file(df):
             
                 if  out_condition.lower()  !='am'   and out_condition.lower()  != 'pm':
                     raise SyntaxError
-                
+                print('here')
                 in_time_hour = intime.split(':')[0]
                 if len(in_time_hour) < 2 and 'am' in in_condition:
                     in_time_hour =f'0{in_time_hour}'
@@ -400,6 +399,7 @@ def get_download_clock_file(df):
                 
                 if 'pm' in in_condition:
                     in_time_hour = str(int(in_time_hour )+ 12)
+
 
                 clock_in = {
                     0 : 'PN00',
