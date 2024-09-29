@@ -1,28 +1,18 @@
 import tkinter as tk 
 from tkinter.filedialog import asksaveasfile,asksaveasfilename
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, messagebox
 import requests
 import os
 import sys
 import pandas as pd
 import requests
-from io import StringIO
 from datetime import date
-import numpy as np
-import json
-import subprocess
 from urllib.request import urlretrieve
-import getpass
-import smtplib
-from email import message
 from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from google_funcs import * 
-
-##https://stackoverflow.com/questions/6932389/how-to-remotely-update-python-applications
-
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -35,7 +25,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-VERSION = '1.0.1'
+VERSION = '1.3'
 main_color = '#313942'
 
 root = tk.Tk()
@@ -146,7 +136,8 @@ def hours_menu(main_background):
     back_button = tk.Button(menu_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear_main(menu_background))
     back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
     
-
+    entourage_logo = tk.Label(menu_background, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6) 
 
 
     settings_button = tk.Button(menu_background,width=w, height=h, image=settings_photo, bg=main_color, activebackground=main_color, borderwidth=0, command= lambda: password())
@@ -156,9 +147,7 @@ def hours_menu(main_background):
     update_date_label = tk.Label(menu_background, text=f'Last updated: {str(date)}', bg=main_color, fg='lightgreen', font=('Times', '13','bold'))
     update_date_label.place(relx=.39, rely= .02)
 
-    entourage_logo = tk.Label(menu_background, width=w, height=h,image=EN_photo,bg=main_color)
-    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
-
+ 
 def password():
     menu_background.destroy()
 
@@ -620,7 +609,7 @@ def send_hours(tree, course):
             attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
             attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
 
-
+        print(hour_sheet)
         msg.attach(attachment)
         msg.attach(attachment2)
         server = smtplib.SMTP('smtp.office365.com', 587)

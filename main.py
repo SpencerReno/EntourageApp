@@ -7,22 +7,12 @@ import os
 import sys
 import pandas as pd
 import requests
-from io import StringIO
-from datetime import date
-import json
-import subprocess
 from urllib.request import urlretrieve
-import getpass
-import time
 import smtplib
-from email import message
 from os.path import basename
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-import configparser
-import json
-import base64
 from github import Github
 
 
