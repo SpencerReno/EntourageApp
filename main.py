@@ -1018,7 +1018,7 @@ def send_hours(tree, course):
         url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
         info = requests.get(url).json()
 
-        from_addr = 'eibehours@outlook.com'
+        from_addr = 'eibehours@gmail.com'
         to_addr = []
         for email in info['info']['HOURS_EMAIL']:
             to_addr.append(str(email))
@@ -1046,17 +1046,23 @@ def send_hours(tree, course):
             attachment2 = MIMEApplication(f.read(), name=basename(hours_sheet_report))
             attachment2['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(hours_sheet_report))
 
-
+        url = 'https://drive.google.com/file/d/1m0qSNWx7e4DN5UxMXXfOSz2sruIYvcqA/view?usp=sharing'
+        path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
+        res = requests.get(path)
+        code = res.text
+        print(hour_sheet)
         msg.attach(attachment)
         msg.attach(attachment2)
-        server = smtplib.SMTP('smtp.office365.com', 587)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
         server.ehlo()
         server.starttls()
         server.ehlo()
-        server.login(from_addr, 'coldL!ght65#')
+        server.login(from_addr, code)
         server.sendmail(from_addr, to_addr, msg.as_string())
         server.quit()
         success_window()
+
+
 
     elif send_clause == ValueError: 
         fail_date_window()
