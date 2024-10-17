@@ -14,6 +14,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from github import Github
+import json
 
 
 
@@ -106,8 +107,12 @@ def show_menu():
     final_100 = tk.Button(main_background, text='Final 100', bg='black', fg='white', command=lambda: final_100_page(main_background))
     final_100.place(relheight=.1,relwidth=.25, relx=.23,rely=.68)
 
-    unpaid = tk.Button(main_background, text='Unpaid Students', bg='black', fg='white', command=lambda: unpaid_students(main_background))
-    unpaid.place(relheight=.1,relwidth=.25, relx=.52,rely=.68)
+    settings_button = tk.Button(main_background, text='App Settings', bg='black', fg='white', command=lambda: app_settings_page(main_background))
+    settings_button.place(relheight=.1,relwidth=.25, relx=.52,rely=.68)
+
+    #+++++++++++++++++++++++++++++++++++++++++++++++++++++++ledger button not used as much +++++++++++++++++++++++++++++++++++++++++++++++++++
+    # unpaid = tk.Button(main_background, text='Unpaid Students', bg='black', fg='white', command=lambda: unpaid_students(main_background))
+    # unpaid.place(relheight=.1,relwidth=.25, relx=.52,rely=.68)
 
     status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
     status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
@@ -117,7 +122,88 @@ def show_menu():
 
     root.mainloop()
 
+def app_settings_page(main_background):
+    main_background.destroy()
+    app_settings_background =tk.Label(blank_background, bg=main_color)
+    app_settings_background.place(relheight=1, relwidth=1)
+    back_button = tk.Button(app_settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_main(app_settings_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+    
+    title_label = tk.Label(app_settings_background, text = 'App Settings', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.12, relwidth=.8)
+    url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+    info = requests.get(url).json()
+    for email in info['info']['HOURS_EMAIL']:
+            email_in_use = str(email)
 
+    warring_label = tk.Label(app_settings_background, 
+    text="""Changing this email will remove any others from reciveing any more submitions.
+             Only the email listed below is allowed to recieve emails.
+                    Once you click save a test email will be sent
+                  to the new email to verify that it was successful.""", fg='red', bg=main_color, anchor='c', font=('Times', '12','bold'))
+    warring_label.place(relx=0, rely=.1, relheight=.35,  relwidth=1)
+    email_entry_label = tk.Label(app_settings_background, text='Active Email', bg=main_color, font=('Times', '28','bold'))
+    email_entry_label.place(relx=.12, rely=.39, relheight=.1,  relwidth=.5)
+    email_entry = tk.Entry(app_settings_background, font=([20]) )
+    email_entry.insert(0, email_in_use)
+    email_entry.place(relx=.17, rely=.49, relheight=.1,  relwidth=.5)
+    email_save_button = tk.Button(app_settings_background, text='save', bg='black', fg='white',activebackground='black', command= lambda: change_hours_email(email_entry))
+    email_save_button.place(relx=.7, rely=.49, relheight=.1,  relwidth=.12)
+
+
+
+def change_hours_email(email_entry):
+    new_email = email_entry.get()
+    try:
+        from_addr = 'eibehours@gmail.com'
+        to_addr =  [new_email]
+        url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+        info = requests.get(url).json()
+        subject = 'Email Change'
+
+        msg = MIMEMultipart()
+        msg['From'] = from_addr
+        msg['To'] = ", ".join(to_addr)
+        msg['Subject'] = subject
+        body = MIMEText(f'Your email has been cahnged to be the only recipiant\n for Entourage online hours submissions.', 'plain')
+
+        msg.attach(body)
+
+        url = 'https://drive.google.com/file/d/1m0qSNWx7e4DN5UxMXXfOSz2sruIYvcqA/view?usp=sharing'
+        path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
+        res = requests.get(path)
+        code = res.text
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(from_addr, code)
+        
+        url = 'https://raw.githubusercontent.com/SpencerReno/EntourageApp/main/app_info.json'
+        info = requests.get(url).json()
+
+        info['info']['HOURS_EMAIL']=[new_email]
+        with open('C:\\Windows\\Temp\\app_info.json', 'w', encoding='utf-8') as f:
+            json.dump(info, f, ensure_ascii=False, indent=4)
+
+        with open('C:\\Windows\\Temp\\app_info.json', 'r') as file:
+            new_file = file.read()
+
+        url = 'https://drive.google.com/file/d/1mAylyV8f-wJFWTl_K8qoak5g1E8PNOA6/view?usp=sharing'
+        path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
+        res = requests.get(path)
+        git_hub_code = res.text
+        g = Github(git_hub_code)
+        repo = g.get_repo('SpencerReno/EntourageApp')
+        contents = repo.get_contents("app_info.json")
+        repo.update_file(contents.path, 'email update', new_file, sha=contents.sha, branch='main')
+        messagebox.showinfo('Success!', 'Email for hours submissions has been updated!')
+        server.sendmail(from_addr, to_addr, msg.as_string())
+        server.quit()
+    except:
+        messagebox.showinfo("Fail", "Invaild Email was not able to send!") 
+
+        
 
 
 def unpaid_students(menu_background): 
