@@ -89,6 +89,9 @@ def show_menu():
     status_button = tk.Button(main_background, text='Student Status', bg='black', fg='white', command=lambda: status_page(main_background))
     status_button.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
 
+    final_100 = tk.Button(main_background, text='Final 100', bg='black', fg='white', command=lambda: final_100_page(main_background))
+    final_100.place(relheight=.1,relwidth=.25, relx=.38,rely=.75)
+
     hours_creator = tk.Button(main_background, text='Hours Creator', bg='black', fg='white', command=lambda: hours_menu(main_background))
     hours_creator.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
     root.mainloop()
@@ -632,6 +635,248 @@ def send_hours(tree, course):
     elif send_clause == SyntaxWarning:
         fail_hours_mixup()
 
+def final_100_page(main_background):
+    main_background.destroy()
+    final_100_background =tk.Label(blank_background, bg=main_color)
+    final_100_background.place(relheight=1, relwidth=1)
+
+
+    
+    hours_title= tk.Label(final_100_background , text="Final 100s", bg=main_color, fg='grey', font=('Times', '36','bold'))
+    hours_title.place(relx=.12, rely=.05, relheight=.15, relwidth=.8)
+
+    menu_cos = tk.Button(final_100_background , text='Cosmetology', bg='black', fg='white', command=lambda: cos_100(final_100_background))
+    menu_cos.place(relheight=.1,relwidth=.25, relx=.23,rely=.6)
+
+    menu_esti = tk.Button(final_100_background , text='Esthetics', bg='maroon', fg='white', command=lambda: esti_100(final_100_background))
+    menu_esti.place(relheight=.1,relwidth=.25, relx=.52,rely=.6)
+
+    menu_nails = tk.Button(final_100_background , text='Nails', bg='DarkBlue', fg='white', command=lambda: nails_100(final_100_background))
+    menu_nails.place(relheight=.1,relwidth=.25, relx=.23,rely=.8)
+
+    menu_massage = tk.Button(final_100_background , text='Massage', bg='dim Grey', fg='white', command=lambda: massage_100(final_100_background))
+    menu_massage.place(relheight=.1,relwidth=.25, relx=.52,rely=.8)
+
+
+    back_button = tk.Button(final_100_background, text='Back', bg='black', fg='white', activebackground='black',command= lambda: clear_main(final_100_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    entourage_logo = tk.Label(final_100_background, width=w, height=h,image=EN_photo,bg=main_color)
+    entourage_logo.place(relx=.19, rely=.23, relheight=.3, relwidth=.6)
+
+
+def esti_100(menu_background):
+    data = course_100_file('Esti')
+    data['Remain hrs']=data['Remain hrs'].astype(float)
+    data = data[data['Remain hrs']<=100]
+    Last_name = data['Name'].str.split(',').str[0]
+    data['Last Name'] =  data['Name'].str.split(' ').str[0]
+
+    First_name = data['Name'].str.split(',').str[1]
+    data['Name'] =  data['Name'].str.split(' ').str[1]
+    data.drop(columns=[ 'Tot hrs', 'LDA hrs', 'Last Name'], inplace=True)
+
+    data = data[['Acct', 'Name', 'Last name', 'Groups', 'Remain hrs', 'Rev grad']]
+    data=data.sort_values(by='Remain hrs')
+    menu_background.destroy()
+    settings_background =tk.Label(blank_background, bg=main_color)
+    settings_background.place(relheight=1, relwidth=1)
+
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_100(settings_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    title_label = tk.Label(settings_background, text = 'Esti Final 100', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
+
+    info_label = tk.Label(settings_background, text = 'Double click any student to open \n student status page', bg=main_color, fg='green', font=('Times', '25','bold'))
+    info_label.place(relx=.1, rely=.75,relheight=.3, relwidth=.8)
+    data_frame = tk.LabelFrame(settings_background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
+
+    tv1 = ttk.Treeview(data_frame)
+    tv1.place(relheight=1, relwidth=1)
+
+    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
+    tv1.configure(yscrollcommand=treescrolly.set)
+    treescrolly.pack(side='right', fill='y')
+
+    tv1['column'] = list(data.columns)
+    tv1['show'] = 'headings'
+
+    for column in tv1['columns']:
+        tv1.heading(column, text=column)
+        tv1.column(column, width=data_frame.winfo_width(), anchor='w')
+
+    df_rows = data.to_numpy().tolist()
+
+    for row in df_rows:
+        tv1.insert('', 'end', values=row)
+
+
+    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    tv1.bind('<Double-Button-1>',  lambda x: select_student(tv1, 'esti_100', settings_background, x))
+
+def cos_100(menu_background):
+    data = course_100_file('Cos')
+    data['Remain hrs']= data['Remain hrs'].str.replace(',', '')
+    data['Remain hrs']=data['Remain hrs'].astype(float)
+    data = data[data['Remain hrs']<=100]
+    Last_name = data['Name'].str.split(',').str[0]
+    data['Last Name'] =  data['Name'].str.split(' ').str[0]
+
+    First_name = data['Name'].str.split(',').str[1]
+    data['Name'] =  data['Name'].str.split(' ').str[1]
+    data.drop(columns=[ 'Tot hrs', 'LDA hrs', 'Last Name'], inplace=True)
+
+    data = data[['Acct', 'Name', 'Last name', 'Groups', 'Remain hrs', 'Rev grad']]
+    data=data.sort_values(by='Remain hrs')
+
+    menu_background.destroy()
+    settings_background =tk.Label(blank_background, bg=main_color)
+    settings_background.place(relheight=1, relwidth=1)
+
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_100(settings_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    title_label = tk.Label(settings_background, text = 'COS Final 100', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
+    info_label = tk.Label(settings_background, text = 'Double click any student to open \n student status page', bg=main_color, fg='green', font=('Times', '25','bold'))
+    info_label.place(relx=.1, rely=.75,relheight=.3, relwidth=.8)
+
+
+
+    data_frame = tk.LabelFrame(settings_background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
+
+    tv1 = ttk.Treeview(data_frame)
+    tv1.place(relheight=1, relwidth=1)
+
+    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
+    tv1.configure(yscrollcommand=treescrolly.set)
+    treescrolly.pack(side='right', fill='y')
+
+    tv1['column'] = list(data.columns)
+    tv1['show'] = 'headings'
+
+    for column in tv1['columns']:
+        tv1.heading(column, text=column)
+        tv1.column(column, width=data_frame.winfo_width(), anchor='w')
+
+    df_rows = data.to_numpy().tolist()
+
+    for row in df_rows:
+        tv1.insert('', 'end', values=row)
+    tv1.bind('<Double-Button-1>',  lambda x: select_student(tv1, 'cos_100', settings_background, x))
+    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    
+
+def nails_100(menu_background):
+    data = course_100_file('Nails')
+    data['Remain hrs']=data['Remain hrs'].astype(float)
+    data = data[data['Remain hrs']<=100]
+    Last_name = data['Name'].str.split(',').str[0]
+    data['Last Name'] =  data['Name'].str.split(' ').str[0]
+
+    First_name = data['Name'].str.split(',').str[1]
+    data['Name'] =  data['Name'].str.split(' ').str[1]
+    data.drop(columns=[ 'Tot hrs', 'LDA hrs', 'Last Name'], inplace=True)
+
+
+    data = data[['Acct', 'Name', 'Last name', 'Groups', 'Remain hrs', 'Rev grad']]
+    data=data.sort_values(by='Remain hrs')
+
+    menu_background.destroy()
+    settings_background =tk.Label(blank_background, bg=main_color)
+    settings_background.place(relheight=1, relwidth=1)
+
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_100(settings_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    title_label = tk.Label(settings_background, text = 'Nails Final 100', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
+    info_label = tk.Label(settings_background, text = 'Double click any student to open \n student status page', bg=main_color, fg='green', font=('Times', '25','bold'))
+    info_label.place(relx=.1, rely=.75,relheight=.3, relwidth=.8)
+
+    data_frame = tk.LabelFrame(settings_background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
+
+    tv1 = ttk.Treeview(data_frame)
+    tv1.place(relheight=1, relwidth=1)
+
+    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
+    tv1.configure(yscrollcommand=treescrolly.set)
+    treescrolly.pack(side='right', fill='y')
+
+    tv1['column'] = list(data.columns)
+    tv1['show'] = 'headings'
+
+    for column in tv1['columns']:
+        tv1.heading(column, text=column)
+        tv1.column(column, width=data_frame.winfo_width(), anchor='w')
+
+    df_rows = data.to_numpy().tolist()
+
+    for row in df_rows:
+        tv1.insert('', 'end', values=row)
+    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    tv1.bind('<Double-Button-1>',  lambda x: select_student(tv1, 'nails_100', settings_background, x))
+    
+
+def massage_100(menu_background):
+    data = course_100_file('Massage')
+    data['Remain hrs']=data['Remain hrs'].astype(float)
+    data = data[data['Remain hrs']<=100]
+    Last_name = data['Name'].str.split(',').str[0]
+    data['Last Name'] =  data['Name'].str.split(' ').str[0]
+
+    First_name = data['Name'].str.split(',').str[1]
+    data['Name'] =  data['Name'].str.split(' ').str[1]
+    data.drop(columns=[ 'Tot hrs', 'LDA hrs', 'Last Name'], inplace=True)
+
+
+    data = data[['Acct', 'Name', 'Last name', 'Remain hrs', 'Rev grad']]
+    data=data.sort_values(by='Remain hrs')
+    menu_background.destroy()
+    settings_background =tk.Label(blank_background, bg=main_color)
+    settings_background.place(relheight=1, relwidth=1)
+
+    back_button = tk.Button(settings_background, text='Back', bg='black', fg='white',activebackground='black', command= lambda: clear_100(settings_background))
+    back_button.place(relheight=.1,relwidth=.1, relx=.0,rely=.0)
+
+    title_label = tk.Label(settings_background, text = 'Massage Final 100', bg=main_color, fg='grey', font=('Times', '36','bold'))
+    title_label.place(relx=.1, rely=0,relheight=.1, relwidth=.8)
+    info_label = tk.Label(settings_background, text = 'Double click any student to open \n student status page', bg=main_color, fg='green', font=('Times', '25','bold'))
+    info_label.place(relx=.1, rely=.75,relheight=.3, relwidth=.8)
+
+
+    data_frame = tk.LabelFrame(settings_background)
+    data_frame.place(rely=0.1, relx=0, relheight=.65,relwidth=1)
+
+
+    tv1 = ttk.Treeview(data_frame)
+    tv1.place(relheight=1, relwidth=1)
+
+    treescrolly = tk.Scrollbar(data_frame, orient='vertical', command=tv1.yview)
+    tv1.configure(yscrollcommand=treescrolly.set)
+    treescrolly.pack(side='right', fill='y')
+
+    tv1['column'] = list(data.columns)
+    tv1['show'] = 'headings'
+
+    for column in tv1['columns']:
+        tv1.heading(column, text=column)
+        tv1.column(column, width=data_frame.winfo_width(), anchor='w')
+
+    df_rows = data.to_numpy().tolist()
+
+    for row in df_rows:
+        tv1.insert('', 'end', values=row)
+
+    tv1.bind("<Control-Key-c>", lambda x: your_copy(tv1, x))
+    tv1.bind('<Double-Button-1>',  lambda x: select_student(tv1, 'massage_100', settings_background, x))
 
 
 def student_explode_view(data, practicaltotals,practical_data, test_data, date, course, background):
@@ -750,25 +995,23 @@ def student_academics_view(data,background, rely, relx, relheight, relwidth):
     
 
 
-  
-
 
 
 def select_student(tree,course, background,  x):
     for y in tree.selection():
         selected_student_id=tree.item(y, 'values')[0]
 
-    if course == 'cos':
+    if course == 'cos' or course == 'cos_100'  :
         date =  get_update_date('cos_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_cos(int(selected_student_id))
-    if course == 'esti':
+    if course == 'esti'or course == 'esti_100' :
         date =  get_update_date('esti_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_esti(int(selected_student_id))
-    if course == 'nails':
+    if course == 'nails'or course == 'nails_100' :
         date =  get_update_date('nails_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_nails(int(selected_student_id))
 
-    if course == 'massage':
+    if course == 'massage'or course == 'massage_100' :
         date =  get_update_date('massage_status')
         data, practicaltotals,practical_data, test_data = student_status_selected_massage(int(selected_student_id))
 
@@ -776,8 +1019,6 @@ def select_student(tree,course, background,  x):
     
     student_explode_view(data, practicaltotals,practical_data, test_data, date, course, background)
   
-
-
 
 
 
@@ -1073,7 +1314,20 @@ def clear_student_explode(background, course):
         status_nails(background)
     if course == 'massage':
         status_massage(background)
+    if course == 'massage_100':
+        massage_100(background)
+    if course == 'cos_100':
+        cos_100(background)
+    if course == 'esti_100':
+        esti_100(background)
+    if course == 'nails_100':
+        nails_100(background)
 
+
+
+
+def clear_100(background):
+    final_100_page(background)
 
 def clear_main(background):
     background.destroy()
